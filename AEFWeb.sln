@@ -1,0 +1,57 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.27004.2002
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Data", "Data", "{3E5F1632-18BF-42BD-B202-AB5217CDDDEF}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Core", "Core", "{D4187979-EA21-49DE-935F-AAB09292764B}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Implementation", "Implementation", "{E6355B60-00EE-4D82-9C68-B21931C28801}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Api", "Api", "{EA31139A-FCA7-46C1-8954-0A89E01FF61F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AEFWeb.Core", "AEFWeb.Core\AEFWeb.Core.csproj", "{BC913117-1633-4CB4-B01D-8BDF4976DA9F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AEFWeb.Data", "AEFWeb.Data\AEFWeb.Data.csproj", "{5145F13D-1542-4D64-A41B-137A07C8DE9C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AEFWeb.Implementation", "AEFWeb.Implementation\AEFWeb.Implementation.csproj", "{EE71BD96-EE31-440F-8EE1-1C7967DC7CAA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AEFWeb.Api", "AEFWeb.Api\AEFWeb.Api.csproj", "{E6078F8B-F4CF-4F0F-A152-C33185A4264A}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{BC913117-1633-4CB4-B01D-8BDF4976DA9F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BC913117-1633-4CB4-B01D-8BDF4976DA9F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BC913117-1633-4CB4-B01D-8BDF4976DA9F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BC913117-1633-4CB4-B01D-8BDF4976DA9F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5145F13D-1542-4D64-A41B-137A07C8DE9C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5145F13D-1542-4D64-A41B-137A07C8DE9C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5145F13D-1542-4D64-A41B-137A07C8DE9C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5145F13D-1542-4D64-A41B-137A07C8DE9C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EE71BD96-EE31-440F-8EE1-1C7967DC7CAA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EE71BD96-EE31-440F-8EE1-1C7967DC7CAA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EE71BD96-EE31-440F-8EE1-1C7967DC7CAA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EE71BD96-EE31-440F-8EE1-1C7967DC7CAA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E6078F8B-F4CF-4F0F-A152-C33185A4264A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E6078F8B-F4CF-4F0F-A152-C33185A4264A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E6078F8B-F4CF-4F0F-A152-C33185A4264A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E6078F8B-F4CF-4F0F-A152-C33185A4264A}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{BC913117-1633-4CB4-B01D-8BDF4976DA9F} = {D4187979-EA21-49DE-935F-AAB09292764B}
+		{5145F13D-1542-4D64-A41B-137A07C8DE9C} = {3E5F1632-18BF-42BD-B202-AB5217CDDDEF}
+		{EE71BD96-EE31-440F-8EE1-1C7967DC7CAA} = {E6355B60-00EE-4D82-9C68-B21931C28801}
+		{E6078F8B-F4CF-4F0F-A152-C33185A4264A} = {EA31139A-FCA7-46C1-8954-0A89E01FF61F}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {DDE219C6-B376-4DEB-9046-BC9BF46A9461}
+	EndGlobalSection
+EndGlobal
