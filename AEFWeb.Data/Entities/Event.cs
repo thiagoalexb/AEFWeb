@@ -6,15 +6,13 @@ namespace AEFWeb.Data.Entities
 {
     public class Event : Entity
     {
-        public Event(Guid id, DateTime date) : base(id)
-        {
-            Date = date;
-        }
+        public Event(Guid id, DateTime date) : base(id) 
+            => Date = date;
 
         public Event() : base(Guid.NewGuid()) { }
 
         public DateTime Date { get; private set; }
 
-        public ICollection<Lesson> Lessons { get; set; }
+        public ICollection<Lesson> Lessons { get; private set; }
     }
 }

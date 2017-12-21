@@ -30,6 +30,7 @@ namespace AEFWeb.Implementation.Services
 
         public void Add(BookViewModel viewModel)
         {
+            viewModel.Id = Guid.NewGuid();
             if (_repository.Find(x => x.Title.ToLower() == viewModel.Title.ToLower()).Count() > 0)
             {
                 _bus.RaiseEvent(new Notification("Este Título já está cadastrado"));
@@ -39,7 +40,7 @@ namespace AEFWeb.Implementation.Services
             _repository.Add(book);
 
             if (Commit())
-                RegisterLog(new EventLog(Guid.NewGuid(), viewModel.CreationDate, viewModel.CreatorUserId, null, null, JsonConvert.SerializeObject(book), Type));
+                RegisterLog(new EventLog(Guid.NewGuid(), viewModel.CreationDate, viewModel.CreatorUserId, null, null, JsonConvert.SerializeObject(viewModel), Type, "Add"));
         }
         
         public void Update(BookViewModel viewModel)
@@ -48,15 +49,16 @@ namespace AEFWeb.Implementation.Services
 
             if (book != null)
             {
-                if (book.Title != viewModel.Title && _repository.Find(x => x.Title.ToLower() == viewModel.Title.ToLower()).Count() > 0)
+                if (book.Id != viewModel.Id && _repository.Find(x => x.Title.ToLower() == viewModel.Title.ToLower()).Count() > 0)
                 {
                     _bus.RaiseEvent(new Notification("Este Título já está cadastrado"));
                     return;
                 }
 
                 _mapper.Map(viewModel, book);
+
                 if (Commit())
-                    RegisterLog(new EventLog(Guid.NewGuid(), null, null, viewModel.LastUpdateDate, viewModel.LastUpdatedUserId, JsonConvert.SerializeObject(book), Type));
+                    RegisterLog(new EventLog(Guid.NewGuid(), null, null, viewModel.LastUpdateDate, viewModel.LastUpdatedUserId, JsonConvert.SerializeObject(viewModel), Type, "Update"));
             }
             else
             {
@@ -70,7 +72,7 @@ namespace AEFWeb.Implementation.Services
             _repository.Remove(book);
 
             if (Commit())
-                RegisterLog(new EventLog(Guid.NewGuid(), null, null, viewModel.LastUpdateDate, viewModel.LastUpdatedUserId, JsonConvert.SerializeObject(book), Type));
+                RegisterLog(new EventLog(Guid.NewGuid(), null, null, viewModel.LastUpdateDate, viewModel.LastUpdatedUserId, JsonConvert.SerializeObject(viewModel), Type, "Remove"));
         }
     }
 }

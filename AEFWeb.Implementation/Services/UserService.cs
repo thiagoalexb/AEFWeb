@@ -34,6 +34,8 @@ namespace AEFWeb.Implementation.Services
 
         public void Add(UserViewModel viewModel)
         {
+            viewModel.Id = Guid.NewGuid();
+
             if (_repository.Find(x => x.Email.ToLower() == viewModel.Email.ToLower()).Count() > 0)
             {
                 _bus.RaiseEvent(new Notification("Este e-mail já está sendo usado"));
@@ -44,7 +46,7 @@ namespace AEFWeb.Implementation.Services
             _repository.Add(user);
 
             if (Commit())
-                RegisterLog(new EventLog(Guid.NewGuid(), viewModel.CreationDate, viewModel.CreatorUserId, null, null, JsonConvert.SerializeObject(user), Type));
+                RegisterLog(new EventLog(Guid.NewGuid(), viewModel.CreationDate, viewModel.CreatorUserId, null, null, JsonConvert.SerializeObject(user), Type, "Add"));
         }
 
         public void Update(UserViewModel viewModel)
@@ -53,7 +55,7 @@ namespace AEFWeb.Implementation.Services
 
             if (user != null)
             {
-                if (user.Email != viewModel.Email && _repository.Find(x => x.Email.ToLower() == viewModel.Email.ToLower()).Count() > 0)
+                if (user.Id != viewModel.Id && _repository.Find(x => x.Email.ToLower() == viewModel.Email.ToLower()).Count() > 0)
                 {
                     _bus.RaiseEvent(new Notification("Este e-mail já está sendo usado"));
                     return;
@@ -61,7 +63,7 @@ namespace AEFWeb.Implementation.Services
 
                 _mapper.Map(viewModel, user);
                 if (Commit())
-                    RegisterLog(new EventLog(Guid.NewGuid(), null, null, viewModel.LastUpdateDate, viewModel.LastUpdatedUserId, JsonConvert.SerializeObject(user), Type));
+                    RegisterLog(new EventLog(Guid.NewGuid(), null, null, viewModel.LastUpdateDate, viewModel.LastUpdatedUserId, JsonConvert.SerializeObject(user), Type, "Update"));
             }
             else
             {
@@ -84,7 +86,8 @@ namespace AEFWeb.Implementation.Services
         public void Remove(UserViewModel viewModel)
         {
             _repository.Remove(_repository.Get(viewModel.Id));
-            Commit();
+            if (Commit())
+                RegisterLog(new EventLog(Guid.NewGuid(), null, null, viewModel.LastUpdateDate, viewModel.LastUpdatedUserId, JsonConvert.SerializeObject(viewModel), Type, "Remove"));
         }
 
         public bool IsVerifyPassword(string passwordLogin, string passwordUser) => 

@@ -7,6 +7,7 @@ using AEFWeb.Data.Entities;
 using AEFWeb.Implementation.Notifications;
 using AEFWeb.Implementation.Services.Core;
 using AutoMapper;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -34,40 +35,44 @@ namespace AEFWeb.Implementation.Services
         public IEnumerable<PostViewModel> GetAll() =>
             _mapper.Map<IEnumerable<PostViewModel>>(_repository.GetAll());
 
-        public void Add(PostViewModel post)
+        public void Add(PostViewModel viewModel)
         {
-            var _post = _mapper.Map<Post>(post);
+            viewModel.Id = Guid.NewGuid();
 
-            _postTagRepository.AddRange(post.Tags.Select(x => new PostTag()
+            var _post = _mapper.Map<Post>(viewModel);
+
+            _postTagRepository.AddRange(viewModel.Tags.Select(x => new PostTag()
             {
                 Post = _post,
                 TagId = x.Id
             }));
 
-            Commit();
+            if (Commit())
+                RegisterLog(new EventLog(Guid.NewGuid(), viewModel.CreationDate, viewModel.CreatorUserId, null, null, JsonConvert.SerializeObject(viewModel), Type, "Add"));
         }
 
-        public void Update(PostViewModel post)
+        public void Update(PostViewModel viewModel)
         {
-            var _post = _repository.Get(post.Id);
+            var post = _repository.Get(viewModel.Id);
 
-
-            if (_post != null)
+            if (post != null)
             {
                 _unitOfWork.BeginTransaction();
-                _postTagRepository.RemoveRange(_post.PostTags);
+                _postTagRepository.RemoveRange(post.PostTags);
                 if (Commit())
                 {
-                    _post = _mapper.Map(post, _post);
+                    post = _mapper.Map(viewModel, post);
                     if (Commit())
                     {
-                        _postTagRepository.AddRange(post.Tags.Select(x => new PostTag()
+                        _postTagRepository.AddRange(viewModel.Tags.Select(x => new PostTag()
                         {
-                            Post = _post,
+                            Post = post,
                             TagId = x.Id
                         }));
 
-                        Commit();
+                        if (Commit())
+                            RegisterLog(new EventLog(Guid.NewGuid(), null, null, viewModel.LastUpdateDate, viewModel.LastUpdatedUserId, JsonConvert.SerializeObject(viewModel), Type, "Update"));
+
                         _unitOfWork.CommitTransaction();
                         _unitOfWork.EndTransaction();
                     }
@@ -94,7 +99,8 @@ namespace AEFWeb.Implementation.Services
             var postTag = _postTagRepository.Find(x => x.PostId == viewModel.Id);
             _postTagRepository.RemoveRange(postTag);
             _repository.Remove(post);
-            Commit();
+            if (Commit())
+                RegisterLog(new EventLog(Guid.NewGuid(), null, null, viewModel.LastUpdateDate, viewModel.LastUpdatedUserId, JsonConvert.SerializeObject(viewModel), Type, "Remove"));
         }
     }
 }

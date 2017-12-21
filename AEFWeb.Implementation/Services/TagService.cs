@@ -42,7 +42,7 @@ namespace AEFWeb.Implementation.Services
             _repository.Add(tag);
 
             if (Commit())
-                RegisterLog(new EventLog(Guid.NewGuid(), viewModel.CreationDate, viewModel.CreatorUserId, null, null, JsonConvert.SerializeObject(tag), Type));
+                RegisterLog(new EventLog(Guid.NewGuid(), viewModel.CreationDate, viewModel.CreatorUserId, null, null, JsonConvert.SerializeObject(tag), Type, "Add"));
         }
 
         public void Update(TagViewModel viewModel)
@@ -59,7 +59,8 @@ namespace AEFWeb.Implementation.Services
 
                 _mapper.Map(viewModel, tag);
                 if (Commit())
-                    RegisterLog(new EventLog(Guid.NewGuid(), null, null, viewModel.LastUpdateDate, viewModel.LastUpdatedUserId, JsonConvert.SerializeObject(tag), Type));
+                    RegisterLog(new EventLog(Guid.NewGuid(), null, null, viewModel.LastUpdateDate, viewModel.LastUpdatedUserId, JsonConvert.SerializeObject(tag), Type, "Update"));
+                    
             }
             else
             {
@@ -73,7 +74,7 @@ namespace AEFWeb.Implementation.Services
             _repository.Remove(tag);
 
             if (Commit())
-                RegisterLog(new EventLog(Guid.NewGuid(), null, null, viewModel.LastUpdateDate, viewModel.LastUpdatedUserId, JsonConvert.SerializeObject(tag), Type));
+                RegisterLog(new EventLog(Guid.NewGuid(), null, null, viewModel.LastUpdateDate, viewModel.LastUpdatedUserId, JsonConvert.SerializeObject(tag), Type, "Remove"));
         }
     }
 }

@@ -10,21 +10,22 @@ using System.Text;
 using AEFWeb.Core.ViewModels;
 using AEFWeb.Implementation.Notifications;
 using AEFWeb.Data.Entities;
+using Newtonsoft.Json;
 
 namespace AEFWeb.Implementation.Services
 {
     public class EventService : Service<IEventRepository>, IEventService
     {
         private readonly IMapper _mapper;
-        private readonly ILessonService _lessonService;
+        private readonly ILessonRepository _lessonRepository;
 
         public EventService(IMapper mapper,
                             IMediatorHandler bus,
                             IUnitOfWork unitOfWork,
-                            ILessonService lessonService) : base(bus, unitOfWork)
+                            ILessonRepository lessonRepository) : base(bus, unitOfWork)
         {
             _mapper = mapper;
-            _lessonService = lessonService;
+            _lessonRepository = lessonRepository;
         }
 
         public EventViewModel Get(Guid id) => 
@@ -35,20 +36,33 @@ namespace AEFWeb.Implementation.Services
 
         public void Add(EventViewModel viewModel)
         {
+            viewModel.Id = Guid.NewGuid();
+
             if (_repository.GetByCriteria(x => x.Date.Date == viewModel.Date.Date) != null)
             {
                 _bus.RaiseEvent(new Notification("Já existe um evento cadastrado para esta data"));
                 return;
             }
-            var @event = _mapper.Map<Event>(viewModel);
-            _repository.Add(@event);
-            if (Commit())
+
+            bool existClass = false;
+            foreach (var schedule in viewModel.Lessons)
             {
-                foreach (var item in viewModel.Lessons)
+                if (_lessonRepository.GetByCriteria(x => x.Schedule.Hour == schedule.Schedule.Hour) != null)
                 {
-                    item.EventId = @event.Id;
-                    _lessonService.Add(item);
+                    _bus.RaiseEvent(new Notification("Já existe uma aula cadastrada para este horario!"));
+                    existClass = true;
+                    break;
                 }
+                schedule.Id = Guid.NewGuid();
+            }
+
+            var @event = _mapper.Map<Event>(viewModel);
+
+            if (!existClass)
+            {
+                _repository.Add(@event);
+                if(Commit())
+                    RegisterLog(new EventLog(Guid.NewGuid(), viewModel.CreationDate, viewModel.CreatorUserId, null, null, JsonConvert.SerializeObject(viewModel), Type, "Add"));
             }
         }
 
@@ -58,14 +72,34 @@ namespace AEFWeb.Implementation.Services
 
             if (@event != null)
             {
-                if (_repository.GetByCriteria(x => x.Date.Date == viewModel.Date.Date) != null)
+                if (_repository.GetByCriteria(x => x.Id != viewModel.Id && x.Date.Date == viewModel.Date.Date) != null)
                 {
                     _bus.RaiseEvent(new Notification("Já existe um evento cadastrado para esta data"));
                     return;
                 }
 
-                _mapper.Map(viewModel, @event);
+                _lessonRepository.RemoveRange(@event.Lessons);
                 Commit();
+
+                bool existClass = false;
+                foreach (var schedule in viewModel.Lessons)
+                {
+                    if (_lessonRepository.GetByCriteria(x => x.Id != schedule.Id && x.Schedule.Hour == schedule.Schedule.Hour) != null)
+                    {
+                        _bus.RaiseEvent(new Notification("Já existe uma aula cadastrada para este horario!"));
+                        existClass = true;
+                        break;
+                    }
+                    schedule.EventId = @event.Id;
+                }
+
+                _mapper.Map(viewModel, @event);
+
+                if (!existClass)
+                {
+                    if (Commit())
+                        RegisterLog(new EventLog(Guid.NewGuid(), null, null, viewModel.LastUpdateDate, viewModel.LastUpdatedUserId, JsonConvert.SerializeObject(viewModel), Type, "Update"));
+                }
             }
             else
             {
@@ -76,7 +110,8 @@ namespace AEFWeb.Implementation.Services
         public void Remove(EventViewModel viewModel)
         {
             _repository.Remove(_repository.Get(viewModel.Id));
-            Commit();
+            if (Commit())
+                RegisterLog(new EventLog(Guid.NewGuid(), null, null, viewModel.LastUpdateDate, viewModel.LastUpdatedUserId, JsonConvert.SerializeObject(viewModel), Type, "Remove"));
         }
     }
 }

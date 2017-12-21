@@ -25,7 +25,7 @@ namespace AEFWeb.Data.Configurations
 
             builder.HasOne(x => x.Event)
                 .WithMany(x => x.Lessons)
-                .OnDelete(DeleteBehavior.Restrict);
+                .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }
