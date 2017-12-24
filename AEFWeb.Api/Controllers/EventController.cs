@@ -21,11 +21,8 @@ namespace AEFWeb.Api.Controllers
 
         [HttpGet]
         [Route("get-all")]
-        public IActionResult Get()
-        {
-            var result = _eventService.GetAll();
-            return Ok(result);
-        }
+        public IActionResult Get() => 
+            Ok(_eventService.GetAll());
 
         [HttpGet]
         [Route("get-by-id")]

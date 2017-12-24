@@ -5,23 +5,37 @@ using AEFWeb.Core.Services;
 using AEFWeb.Core.UnitOfWork;
 using AEFWeb.Core.ViewModels;
 using AEFWeb.Data.Entities;
+using AEFWeb.Implementation.EmailSettings;
 using AEFWeb.Implementation.Notifications;
 using AEFWeb.Implementation.Services.Core;
 using AutoMapper;
+using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Reflection;
 
 namespace AEFWeb.Implementation.Services
 {
     public class UserService : Service<IUserRepository>, IUserService
     {
         private readonly IMapper _mapper;
+        private readonly IEmailService _emailService;
+
+        public BaseUrl _urlSettings { get; }
 
         public UserService(IUnitOfWork unitOfWork,
                             IMapper mapper,
-                            IMediatorHandler bus) : base(bus, unitOfWork) => _mapper = mapper;
+                            IMediatorHandler bus,
+                            IEmailService emailService,
+                            IOptions<BaseUrl> urlSettings) : base(bus, unitOfWork)
+        {
+            _mapper = mapper;
+            _emailService = emailService;
+            _urlSettings = urlSettings.Value;
+        }
 
         public UserViewModel Get(Guid id) =>
             _mapper.Map<UserViewModel>(_repository.Get(id));
@@ -46,7 +60,11 @@ namespace AEFWeb.Implementation.Services
             _repository.Add(user);
 
             if (Commit())
+            {
                 RegisterLog(new EventLog(Guid.NewGuid(), viewModel.CreationDate, viewModel.CreatorUserId, null, null, JsonConvert.SerializeObject(user), Type, "Add"));
+
+                _emailService.SendEmailAsync(viewModel.Email, "Cadastro AEF", BuildActiveMessage(viewModel));
+            }
         }
 
         public void Update(UserViewModel viewModel)
@@ -90,7 +108,14 @@ namespace AEFWeb.Implementation.Services
                 RegisterLog(new EventLog(Guid.NewGuid(), null, null, viewModel.LastUpdateDate, viewModel.LastUpdatedUserId, JsonConvert.SerializeObject(viewModel), Type, "Remove"));
         }
 
-        public bool IsVerifyPassword(string passwordLogin, string passwordUser) => 
+        public bool IsVerifyPassword(string passwordLogin, string passwordUser) =>
             Utils.Utils.EncryptPassword(passwordLogin).ToLower() == passwordUser;
+
+        private string BuildActiveMessage(UserViewModel viewModel)
+        {
+            var html = Properties.Resources.ConfirmEmailTemplate;
+            html = html.Replace("{Url}", $"{_urlSettings.Url}ativar-conta/{viewModel.Email}");
+            return html;
+        }
     }
 }

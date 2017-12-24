@@ -43,11 +43,13 @@ namespace AEFWeb.Data.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(nullable: false),
-                    CreationDate = table.Column<DateTime>(nullable: false),
+                    Action = table.Column<string>(nullable: true),
+                    CreationDate = table.Column<DateTime>(nullable: true),
                     CreatorUserId = table.Column<Guid>(nullable: true),
                     Data = table.Column<string>(nullable: true),
                     LastUpdateDate = table.Column<DateTime>(nullable: true),
-                    LastUpdatedUserId = table.Column<Guid>(nullable: true)
+                    LastUpdatedUserId = table.Column<Guid>(nullable: true),
+                    Type = table.Column<string>(nullable: true)
                 },
                 constraints: table =>
                 {
@@ -154,7 +156,7 @@ namespace AEFWeb.Data.Migrations
                         column: x => x.PostId,
                         principalTable: "Posts",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_PostTag_Tags_TagId",
                         column: x => x.TagId,

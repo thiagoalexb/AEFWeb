@@ -1,8 +1,9 @@
+using AEFWeb.Api.Extensions;
 using AEFWeb.Api.IoC;
-using AEFWeb.Api.Middlewares;
 using AEFWeb.Api.Security;
 using AEFWeb.Api.Swagger;
 using AEFWeb.Core.AutoMapper;
+using AEFWeb.Implementation.EmailSettings;
 using AutoMapper;
 using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -12,7 +13,6 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
-using Swashbuckle.AspNetCore.Swagger;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using Swashbuckle.AspNetCore.SwaggerUI;
 using System;
@@ -74,6 +74,9 @@ namespace AEFWeb.Api
             services.AddMediatR(typeof(Startup));
 
             RegisterServices(services, config.CreateMapper());
+
+            services.Configure<EmailSetting>(Configuration.GetSection("EmailSettings"));
+            services.Configure<BaseUrl>(Configuration.GetSection("BaseUrl"));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -82,20 +85,19 @@ namespace AEFWeb.Api
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
-                app.UseBrowserLink();
             }
             else
             {
                 app.UseExceptionHandler("/Error");
             }
 
+            app.UseErrorHandlingMiddleware();
+
             app.UseMvc();
 
             app.UseSwagger();
 
             app.UseSwaggerUI(c => { ConfigUISwagger(c); });
-
-            app.UseMiddleware(typeof(ErrorHandlingMiddleware));
         }
 
         private static void RegisterServices(IServiceCollection services, IMapper mapper) => 

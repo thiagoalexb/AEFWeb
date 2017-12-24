@@ -2,9 +2,11 @@
 using AEFWeb.Api.Filters;
 using AEFWeb.Core.Services;
 using AEFWeb.Core.ViewModels;
+using AEFWeb.Data.Entities;
 using AEFWeb.Implementation.Notifications;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using System;
 
 namespace AEFWeb.Api.Controllers
@@ -16,9 +18,8 @@ namespace AEFWeb.Api.Controllers
         private readonly ITagService _tagService;
 
         public TagController(ITagService tagService,
-                                INotificationHandler<Notification> notifications) : base(notifications) =>
-           _tagService = tagService;
-
+                                INotificationHandler<Notification> notifications) 
+                                            : base(notifications) => _tagService = tagService;
         [HttpGet]
         [Route("get-all")]
         public IActionResult Get() => Ok(_tagService.GetAll());

@@ -1,20 +1,24 @@
-﻿using AEFWeb.Core.Notifications;
-using AEFWeb.Core.Repositories;
+﻿using AEFWeb.Core.Repositories;
 using AEFWeb.Core.Services;
 using AEFWeb.Core.UnitOfWork;
 using AEFWeb.Data.Entities;
-using AEFWeb.Implementation.Services.Core;
 
 namespace AEFWeb.Implementation.Services
 {
-    public class EventLogService : Service<IEventLogRepository>, IEventLogService
+    public class EventLogService : IEventLogService
     {
-        public EventLogService(IMediatorHandler bus, IUnitOfWork unitOfWork) 
-                                    : base(bus, unitOfWork) { }
+        private readonly IEventLogRepository _eventLogRepository;
+        private readonly IUnitOfWork _unitOfWork;
+
+        public EventLogService(IUnitOfWork unitOfWork, IEventLogRepository eventLogRepository)
+        {
+            _unitOfWork = unitOfWork;
+            _eventLogRepository = eventLogRepository;
+        }
 
         public void Add(EventLog entity)
         {
-            _repository.Add(entity);
+            _eventLogRepository.Add(entity);
             _unitOfWork.Complete();
         }
     }

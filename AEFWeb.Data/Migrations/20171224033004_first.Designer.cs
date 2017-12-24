@@ -11,8 +11,8 @@ using System;
 namespace AEFWeb.Data.Migrations
 {
     [DbContext(typeof(AEFContext))]
-    [Migration("20171217235300_test")]
-    partial class test
+    [Migration("20171224033004_first")]
+    partial class first
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -84,6 +84,8 @@ namespace AEFWeb.Data.Migrations
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd();
+
+                    b.Property<string>("Action");
 
                     b.Property<DateTime?>("CreationDate");
 
@@ -228,7 +230,7 @@ namespace AEFWeb.Data.Migrations
                     b.HasOne("AEFWeb.Data.Entities.Event", "Event")
                         .WithMany("Lessons")
                         .HasForeignKey("EventId")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .OnDelete(DeleteBehavior.Cascade);
                 });
 
             modelBuilder.Entity("AEFWeb.Data.Entities.Post", b =>

@@ -2,7 +2,6 @@
 using AEFWeb.Core.Repositories;
 using AEFWeb.Core.Services;
 using AEFWeb.Core.UnitOfWork;
-using AEFWeb.Core.ViewModels;
 using AEFWeb.Data.Context;
 using AEFWeb.Implementation.Notifications;
 using AEFWeb.Implementation.Repositories;
@@ -10,6 +9,7 @@ using AEFWeb.Implementation.Services;
 using AEFWeb.Implementation.UnitOfWork;
 using AutoMapper;
 using MediatR;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -19,6 +19,8 @@ namespace AEFWeb.Api.IoC
     {
         public static void RegisterServices(IServiceCollection services, IMapper mapper)
         {
+            services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+
             //Auto Mapper
             services.AddSingleton(mapper);
 
@@ -34,6 +36,7 @@ namespace AEFWeb.Api.IoC
             services.AddScoped<IEventService, EventService>();
             services.AddScoped<IErrorLogService, ErrorLogService>();
             services.AddScoped<IEventLogService, EventLogService>();
+            services.AddScoped<IEmailService, EmailService>();
 
             //Repository
             services.AddScoped<IEventLogRepository, EventLogRepository>();

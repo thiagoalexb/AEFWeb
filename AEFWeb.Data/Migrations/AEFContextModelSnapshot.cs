@@ -84,6 +84,8 @@ namespace AEFWeb.Data.Migrations
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd();
 
+                    b.Property<string>("Action");
+
                     b.Property<DateTime?>("CreationDate");
 
                     b.Property<Guid?>("CreatorUserId");
@@ -227,7 +229,7 @@ namespace AEFWeb.Data.Migrations
                     b.HasOne("AEFWeb.Data.Entities.Event", "Event")
                         .WithMany("Lessons")
                         .HasForeignKey("EventId")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .OnDelete(DeleteBehavior.Cascade);
                 });
 
             modelBuilder.Entity("AEFWeb.Data.Entities.Post", b =>
