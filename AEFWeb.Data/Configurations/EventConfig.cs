@@ -2,9 +2,6 @@
 using AEFWeb.Data.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace AEFWeb.Data.Configurations
 {
@@ -14,11 +11,14 @@ namespace AEFWeb.Data.Configurations
         {
             builder.Property(c => c.Id);
 
-            builder.Property(c => c.Date)
-                .HasMaxLength(100)
-                .IsRequired();
+            builder.Property(c => c.StartDate)
+               .IsRequired();
 
-            builder.HasMany(c => c.Lessons);
+            builder.Property(c => c.EndDate)
+               .IsRequired();
+
+            builder.HasOne(c => c.Lesson)
+                .WithMany(c => c.Events);
         }
     }
 }

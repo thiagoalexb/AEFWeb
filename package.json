@@ -1,0 +1,18 @@
+{
+  "author": "",
+  "description": "",
+  "keywords": [],
+  "license": "ISC",
+  "main": "index.js",
+  "name": "AEFWeb.Site",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "version": "1.0.0",
+  "dependencies": {
+    "npm": "^5.6.0"
+  },
+  "devDependencies": {
+    "webpack": "^3.10.0"
+  }
+}

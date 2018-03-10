@@ -11,13 +11,13 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Implementation", "Implement
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Api", "Api", "{EA31139A-FCA7-46C1-8954-0A89E01FF61F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AEFWeb.Core", "AEFWeb.Core\AEFWeb.Core.csproj", "{BC913117-1633-4CB4-B01D-8BDF4976DA9F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AEFWeb.Core", "AEFWeb.Core\AEFWeb.Core.csproj", "{BC913117-1633-4CB4-B01D-8BDF4976DA9F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AEFWeb.Data", "AEFWeb.Data\AEFWeb.Data.csproj", "{5145F13D-1542-4D64-A41B-137A07C8DE9C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AEFWeb.Data", "AEFWeb.Data\AEFWeb.Data.csproj", "{5145F13D-1542-4D64-A41B-137A07C8DE9C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AEFWeb.Implementation", "AEFWeb.Implementation\AEFWeb.Implementation.csproj", "{EE71BD96-EE31-440F-8EE1-1C7967DC7CAA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AEFWeb.Implementation", "AEFWeb.Implementation\AEFWeb.Implementation.csproj", "{EE71BD96-EE31-440F-8EE1-1C7967DC7CAA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AEFWeb.Api", "AEFWeb.Api\AEFWeb.Api.csproj", "{E6078F8B-F4CF-4F0F-A152-C33185A4264A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AEFWeb.Api", "AEFWeb.Api\AEFWeb.Api.csproj", "{E6078F8B-F4CF-4F0F-A152-C33185A4264A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

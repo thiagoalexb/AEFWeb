@@ -10,6 +10,17 @@ namespace AEFWeb.Data.Configurations
         public void Configure(EntityTypeBuilder<ErrorLog> builder)
         {
             builder.Property(c => c.Id);
+
+            builder.Property(c => c.Message)
+                .HasColumnType("varchar(5000)")
+                .HasMaxLength(5000);
+
+            builder.Property(c => c.ExceptionString)
+                .HasColumnType("varchar(5000)")
+                .HasMaxLength(5000);
+
+            builder.Property(c => c.Date)
+                .IsRequired();
         }
     }
 }

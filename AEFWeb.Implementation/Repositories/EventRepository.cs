@@ -14,16 +14,16 @@ namespace AEFWeb.Implementation.Repositories
         public EventRepository(DbContext context) : base(context)
         { }
 
-        public override IEnumerable<Event> GetAll() =>
-            DbSet.Include(x => x.Lessons).ToList();
+        //public override IEnumerable<Event> GetAll() =>
+        //    DbSet.Include(x => x.Lessons).ToList();
 
-        public override Event Get(Guid id) =>
-            DbSet.Include(x => x.Lessons).FirstOrDefault(x => x.Id == id);
+        //public override Event Get(Guid id) =>
+        //    DbSet.Include(x => x.Lessons).FirstOrDefault(x => x.Id == id);
 
-        public override IEnumerable<Event> Find(Expression<Func<Event, bool>> predicate) =>
-           DbSet.Include(x => x.Lessons).Where(predicate);
+        //public override IEnumerable<Event> Find(Expression<Func<Event, bool>> predicate) =>
+        //   DbSet.Include(x => x.Lessons).Where(predicate);
 
-        public override Event GetByCriteria(Expression<Func<Event, bool>> predicate) =>
-            DbSet.Include(x => x.Lessons).FirstOrDefault(predicate);
+        //public override Event GetByCriteria(Expression<Func<Event, bool>> predicate) =>
+        //    DbSet.Include(x => x.Lessons).FirstOrDefault(predicate);
     }
 }

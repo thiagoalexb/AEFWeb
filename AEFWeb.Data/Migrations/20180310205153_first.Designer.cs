@@ -11,7 +11,7 @@ using System;
 namespace AEFWeb.Data.Migrations
 {
     [DbContext(typeof(AEFContext))]
-    [Migration("20171224033004_first")]
+    [Migration("20180310205153_first")]
     partial class first
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -30,6 +30,8 @@ namespace AEFWeb.Data.Migrations
                         .IsRequired()
                         .HasColumnType("varchar(100)")
                         .HasMaxLength(100);
+
+                    b.Property<bool>("Deleted");
 
                     b.Property<string>("Edition")
                         .HasColumnType("varchar(100)")
@@ -58,9 +60,17 @@ namespace AEFWeb.Data.Migrations
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd();
 
-                    b.Property<string>("ExceptionString");
+                    b.Property<DateTime>("Date");
 
-                    b.Property<string>("Message");
+                    b.Property<bool>("Deleted");
+
+                    b.Property<string>("ExceptionString")
+                        .HasColumnType("varchar(5000)")
+                        .HasMaxLength(5000);
+
+                    b.Property<string>("Message")
+                        .HasColumnType("varchar(5000)")
+                        .HasMaxLength(5000);
 
                     b.HasKey("Id");
 
@@ -72,10 +82,17 @@ namespace AEFWeb.Data.Migrations
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd();
 
-                    b.Property<DateTime>("Date")
-                        .HasMaxLength(100);
+                    b.Property<bool>("Deleted");
+
+                    b.Property<DateTime>("EndDate");
+
+                    b.Property<Guid>("LessonId");
+
+                    b.Property<DateTime>("StartDate");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("LessonId");
 
                     b.ToTable("Events");
                 });
@@ -85,23 +102,50 @@ namespace AEFWeb.Data.Migrations
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd();
 
-                    b.Property<string>("Action");
+                    b.Property<string>("Action")
+                        .HasColumnType("varchar(100)")
+                        .HasMaxLength(100);
 
                     b.Property<DateTime?>("CreationDate");
 
                     b.Property<Guid?>("CreatorUserId");
 
-                    b.Property<string>("Data");
+                    b.Property<string>("Data")
+                        .IsRequired()
+                        .HasColumnType("varchar(5000)")
+                        .HasMaxLength(5000);
 
-                    b.Property<DateTime?>("LastUpdateDate");
+                    b.Property<bool>("Deleted");
 
-                    b.Property<Guid?>("LastUpdatedUserId");
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasColumnType("varchar(100)")
+                        .HasMaxLength(100);
 
-                    b.Property<string>("Type");
+                    b.Property<DateTime?>("UpdateDate");
+
+                    b.Property<Guid?>("UpdatedUserId");
 
                     b.HasKey("Id");
 
                     b.ToTable("EventLog");
+                });
+
+            modelBuilder.Entity("AEFWeb.Data.Entities.Fase", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<bool>("Deleted");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("varchar(100)")
+                        .HasMaxLength(100);
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Fase");
                 });
 
             modelBuilder.Entity("AEFWeb.Data.Entities.Lesson", b =>
@@ -109,9 +153,17 @@ namespace AEFWeb.Data.Migrations
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd();
 
-                    b.Property<Guid>("EventId");
+                    b.Property<int>("Code");
 
-                    b.Property<DateTime>("Schedule");
+                    b.Property<bool>("Deleted");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("varchar(1000)")
+                        .HasMaxLength(100);
+
+                    b.Property<Guid?>("ModuleId");
+
+                    b.Property<Guid?>("SpecialWeekId");
 
                     b.Property<string>("SubTitle")
                         .HasColumnType("varchar(100)")
@@ -124,9 +176,35 @@ namespace AEFWeb.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("EventId");
+                    b.HasIndex("ModuleId");
+
+                    b.HasIndex("SpecialWeekId");
 
                     b.ToTable("Lessons");
+                });
+
+            modelBuilder.Entity("AEFWeb.Data.Entities.Module", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<bool>("Deleted");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("varchar(5000)")
+                        .HasMaxLength(100);
+
+                    b.Property<Guid>("FaseId");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("varchar(100)")
+                        .HasMaxLength(100);
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("FaseId");
+
+                    b.ToTable("Module");
                 });
 
             modelBuilder.Entity("AEFWeb.Data.Entities.Post", b =>
@@ -138,6 +216,8 @@ namespace AEFWeb.Data.Migrations
                         .IsRequired()
                         .HasColumnType("varchar(max)")
                         .HasMaxLength(100);
+
+                    b.Property<bool>("Deleted");
 
                     b.Property<string>("MainImage")
                         .HasColumnType("varchar(150)")
@@ -177,10 +257,56 @@ namespace AEFWeb.Data.Migrations
                     b.ToTable("PostTag");
                 });
 
+            modelBuilder.Entity("AEFWeb.Data.Entities.SpecialWeek", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<bool>("Deleted");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("varchar(5000)")
+                        .HasMaxLength(100);
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasColumnType("varchar(100)")
+                        .HasMaxLength(100);
+
+                    b.HasKey("Id");
+
+                    b.ToTable("SpecialWeek");
+                });
+
+            modelBuilder.Entity("AEFWeb.Data.Entities.SystemConfiguration", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<bool>("Deleted");
+
+                    b.Property<string>("Key")
+                        .IsRequired()
+                        .HasColumnType("varchar(100)")
+                        .HasMaxLength(100);
+
+                    b.Property<string>("Value")
+                        .IsRequired()
+                        .HasColumnType("varchar(100)")
+                        .HasMaxLength(100);
+
+                    b.HasKey("Id");
+
+                    b.ToTable("SystemConfiguration");
+                });
+
             modelBuilder.Entity("AEFWeb.Data.Entities.Tag", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd();
+
+                    b.Property<bool>("Deleted");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -198,6 +324,8 @@ namespace AEFWeb.Data.Migrations
                         .ValueGeneratedOnAdd();
 
                     b.Property<DateTime>("DateOfBirth");
+
+                    b.Property<bool>("Deleted");
 
                     b.Property<string>("Email")
                         .IsRequired()
@@ -225,11 +353,30 @@ namespace AEFWeb.Data.Migrations
                     b.ToTable("Users");
                 });
 
+            modelBuilder.Entity("AEFWeb.Data.Entities.Event", b =>
+                {
+                    b.HasOne("AEFWeb.Data.Entities.Lesson", "Lesson")
+                        .WithMany("Events")
+                        .HasForeignKey("LessonId")
+                        .OnDelete(DeleteBehavior.Cascade);
+                });
+
             modelBuilder.Entity("AEFWeb.Data.Entities.Lesson", b =>
                 {
-                    b.HasOne("AEFWeb.Data.Entities.Event", "Event")
+                    b.HasOne("AEFWeb.Data.Entities.Module", "Module")
                         .WithMany("Lessons")
-                        .HasForeignKey("EventId")
+                        .HasForeignKey("ModuleId");
+
+                    b.HasOne("AEFWeb.Data.Entities.SpecialWeek", "SpecialWeek")
+                        .WithMany("Lessons")
+                        .HasForeignKey("SpecialWeekId");
+                });
+
+            modelBuilder.Entity("AEFWeb.Data.Entities.Module", b =>
+                {
+                    b.HasOne("AEFWeb.Data.Entities.Fase", "Fase")
+                        .WithMany("Modules")
+                        .HasForeignKey("FaseId")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 

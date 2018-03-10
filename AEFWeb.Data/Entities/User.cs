@@ -5,7 +5,13 @@ namespace AEFWeb.Data.Entities
 {
     public class User : Entity
     {
-        public User(Guid id, string firstName, string lastName, string email, string password, DateTime dateOfBirth, bool isVerified) : base (id)
+        public User(Guid id, 
+            string firstName, 
+            string lastName, 
+            string email, 
+            string password, 
+            DateTime dateOfBirth, 
+            bool isVerified) : base (id)
         {
             FirstName = firstName;
             LastName = lastName;

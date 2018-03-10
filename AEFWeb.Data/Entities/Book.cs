@@ -5,7 +5,13 @@ namespace AEFWeb.Data.Entities
 {
     public class Book : Entity
     {
-        public Book(Guid id, string publishingCompany, string edition, string author, string title, bool isSale, decimal value) : base(id)
+        public Book(Guid id, 
+            string publishingCompany, 
+            string edition, 
+            string author, 
+            string title, 
+            bool isSale, 
+            decimal value) : base(id)
         {
             PublishingCompany = publishingCompany;
             Edition = edition;

@@ -18,11 +18,19 @@ namespace AEFWeb.Api
             BuildWebHost(args).Run();
         }
 
-        public static IWebHost BuildWebHost(string[] args) =>
-            WebHost.CreateDefaultBuilder(args)
+        public static IWebHost BuildWebHost(string[] args)
+        {
+            return WebHost.CreateDefaultBuilder(args)
                 .ConfigureAppConfiguration((hostingContext, config) =>
                 {
                     var env = hostingContext.HostingEnvironment;
+
+                    config.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+#if DEBUG
+                .AddJsonFile($"appsettings.Development.json", optional: true, reloadOnChange: true);
+#else
+                .AddJsonFile($"appsettings.Production.json", optional: true, reloadOnChange: true);
+#endif
 
                     if (env.IsDevelopment())
                     {
@@ -34,7 +42,10 @@ namespace AEFWeb.Api
                     }
                     config.AddEnvironmentVariables();
                 })
+                .UseKestrel()
                 .UseStartup<Startup>()
+                .UseIISIntegration()
                 .Build();
+        }
     }
 }

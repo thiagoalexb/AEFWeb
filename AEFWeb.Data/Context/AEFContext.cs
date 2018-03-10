@@ -20,6 +20,7 @@ namespace AEFWeb.Data.Context
         public DbSet<EventLog> EventLog { get; set; }
         public DbSet<ErrorLog> ErrorLog { get; set; }
         public DbSet<PostTag> PostTag { get; set; }
+        public DbSet<SystemConfiguration> SystemConfiguration { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -39,12 +40,14 @@ namespace AEFWeb.Data.Context
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            // get the configuration from the app settings
-            var env = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
             var config = new ConfigurationBuilder()
                 .SetBasePath(Directory.GetCurrentDirectory())
                 .AddJsonFile("appsettings.json")
-                .AddJsonFile($"appsettings.{env}.json", optional: true, reloadOnChange: true)
+#if DEBUG
+                .AddJsonFile($"appsettings.Development.json", optional: true, reloadOnChange: true)
+#else
+                .AddJsonFile($"appsettings.Production.json", optional: true, reloadOnChange: true)
+#endif
                 .Build();
 
             // define the database to use

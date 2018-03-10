@@ -5,12 +5,12 @@ namespace AEFWeb.Data.Entities
 {
     public class EventLog : Entity
     {
-        public EventLog(Guid id, DateTime? creationDate, Guid? creatorUserId, DateTime? lastUpdateDate, Guid? lastUpdatedUserId, string data, string type, string action) : base(id)
+        public EventLog(Guid id, DateTime? creationDate, Guid? creatorUserId, DateTime? updateDate, Guid? updatedUserId, string data, string type, string action) : base(id)
         {
             CreationDate = creationDate;
             CreatorUserId = creatorUserId;
-            LastUpdateDate = lastUpdateDate;
-            LastUpdatedUserId = lastUpdatedUserId;
+            UpdateDate = updateDate;
+            UpdatedUserId = updatedUserId;
             Data = data;
             Type = type;
             Action = action;
@@ -21,11 +21,11 @@ namespace AEFWeb.Data.Entities
         public DateTime? CreationDate { get; private set; }
         public Guid? CreatorUserId { get; private set; }
 
-        public DateTime? LastUpdateDate { get; private set; }
-        public Guid? LastUpdatedUserId { get; private set; }
+        public DateTime? UpdateDate { get; private set; }
+        public Guid? UpdatedUserId { get; private set; }
 
         public string Data { get; private set; }
-        public string Type { get; set; }
-        public string Action { get; set; }
+        public string Type { get; private set; }
+        public string Action { get; private set; }
     }
 }

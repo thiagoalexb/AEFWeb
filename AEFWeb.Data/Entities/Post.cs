@@ -6,7 +6,13 @@ namespace AEFWeb.Data.Entities
 {
     public class Post : Entity
     {
-        public Post(Guid id, string title, string subTitle, string mainImage, string content, DateTime publicationDate, Guid userId) : base(id)
+        public Post(Guid id,
+            Guid userId,
+            string title, 
+            string subTitle, 
+            string mainImage, 
+            string content, 
+            DateTime publicationDate) : base(id)
         {
             Title = title;
             SubTitle = subTitle;

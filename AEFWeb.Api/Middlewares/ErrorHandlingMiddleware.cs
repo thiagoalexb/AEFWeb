@@ -35,9 +35,10 @@ namespace AEFWeb.Api.Middlewares
 
         private Task HandleExceptionAsync(HttpContext context, Exception exception)
         {
-            _errorLogService.Add(new ErrorLog(Guid.NewGuid(), GetErrorMessage(exception), exception.ToString()));
+            var errorMessage = GetErrorMessage(exception);
+            _errorLogService.Add(new ErrorLog(Guid.NewGuid(), errorMessage, exception.ToString()));
 
-            var result = JsonConvert.SerializeObject(new { error = "Some error(s) occoured." });
+            var result = JsonConvert.SerializeObject(new { error = errorMessage });
             context.Response.ContentType = "application/json";
             context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
             return context.Response.WriteAsync(result);

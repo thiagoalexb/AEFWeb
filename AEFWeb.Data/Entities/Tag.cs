@@ -7,9 +7,7 @@ namespace AEFWeb.Data.Entities
     public class Tag : Entity
     {
         public Tag(Guid id, string name) : base(id)
-        {
-            Name = name;
-        }
+             => Name = name;
 
         public Tag() : base(Guid.NewGuid()) { }
 

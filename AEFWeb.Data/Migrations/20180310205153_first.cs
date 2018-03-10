@@ -14,6 +14,7 @@ namespace AEFWeb.Data.Migrations
                 {
                     Id = table.Column<Guid>(nullable: false),
                     Author = table.Column<string>(type: "varchar(100)", maxLength: 100, nullable: false),
+                    Deleted = table.Column<bool>(nullable: false),
                     Edition = table.Column<string>(type: "varchar(100)", maxLength: 100, nullable: true),
                     IsSale = table.Column<bool>(nullable: false),
                     PublishingCompany = table.Column<string>(type: "varchar(100)", maxLength: 100, nullable: true),
@@ -30,8 +31,10 @@ namespace AEFWeb.Data.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(nullable: false),
-                    ExceptionString = table.Column<string>(nullable: true),
-                    Message = table.Column<string>(nullable: true)
+                    Date = table.Column<DateTime>(nullable: false),
+                    Deleted = table.Column<bool>(nullable: false),
+                    ExceptionString = table.Column<string>(type: "varchar(5000)", maxLength: 5000, nullable: true),
+                    Message = table.Column<string>(type: "varchar(5000)", maxLength: 5000, nullable: true)
                 },
                 constraints: table =>
                 {
@@ -43,13 +46,14 @@ namespace AEFWeb.Data.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(nullable: false),
-                    Action = table.Column<string>(nullable: true),
+                    Action = table.Column<string>(type: "varchar(100)", maxLength: 100, nullable: true),
                     CreationDate = table.Column<DateTime>(nullable: true),
                     CreatorUserId = table.Column<Guid>(nullable: true),
-                    Data = table.Column<string>(nullable: true),
-                    LastUpdateDate = table.Column<DateTime>(nullable: true),
-                    LastUpdatedUserId = table.Column<Guid>(nullable: true),
-                    Type = table.Column<string>(nullable: true)
+                    Data = table.Column<string>(type: "varchar(5000)", maxLength: 5000, nullable: false),
+                    Deleted = table.Column<bool>(nullable: false),
+                    Type = table.Column<string>(type: "varchar(100)", maxLength: 100, nullable: false),
+                    UpdateDate = table.Column<DateTime>(nullable: true),
+                    UpdatedUserId = table.Column<Guid>(nullable: true)
                 },
                 constraints: table =>
                 {
@@ -57,15 +61,44 @@ namespace AEFWeb.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Events",
+                name: "Fase",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(nullable: false),
-                    Date = table.Column<DateTime>(maxLength: 100, nullable: false)
+                    Deleted = table.Column<bool>(nullable: false),
+                    Name = table.Column<string>(type: "varchar(100)", maxLength: 100, nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Events", x => x.Id);
+                    table.PrimaryKey("PK_Fase", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "SpecialWeek",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(nullable: false),
+                    Deleted = table.Column<bool>(nullable: false),
+                    Description = table.Column<string>(type: "varchar(5000)", maxLength: 100, nullable: false),
+                    Title = table.Column<string>(type: "varchar(100)", maxLength: 100, nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_SpecialWeek", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "SystemConfiguration",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(nullable: false),
+                    Deleted = table.Column<bool>(nullable: false),
+                    Key = table.Column<string>(type: "varchar(100)", maxLength: 100, nullable: false),
+                    Value = table.Column<string>(type: "varchar(100)", maxLength: 100, nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_SystemConfiguration", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -73,6 +106,7 @@ namespace AEFWeb.Data.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(nullable: false),
+                    Deleted = table.Column<bool>(nullable: false),
                     Name = table.Column<string>(type: "varchar(100)", maxLength: 100, nullable: false)
                 },
                 constraints: table =>
@@ -86,6 +120,7 @@ namespace AEFWeb.Data.Migrations
                 {
                     Id = table.Column<Guid>(nullable: false),
                     DateOfBirth = table.Column<DateTime>(nullable: false),
+                    Deleted = table.Column<bool>(nullable: false),
                     Email = table.Column<string>(type: "varchar(100)", maxLength: 100, nullable: false),
                     FirstName = table.Column<string>(type: "varchar(100)", maxLength: 100, nullable: false),
                     IsVerified = table.Column<bool>(nullable: false),
@@ -98,22 +133,22 @@ namespace AEFWeb.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Lessons",
+                name: "Module",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(nullable: false),
-                    EventId = table.Column<Guid>(nullable: false),
-                    Schedule = table.Column<DateTime>(nullable: false),
-                    SubTitle = table.Column<string>(type: "varchar(100)", maxLength: 100, nullable: true),
-                    Title = table.Column<string>(type: "varchar(100)", maxLength: 100, nullable: false)
+                    Deleted = table.Column<bool>(nullable: false),
+                    Description = table.Column<string>(type: "varchar(5000)", maxLength: 100, nullable: true),
+                    FaseId = table.Column<Guid>(nullable: false),
+                    Name = table.Column<string>(type: "varchar(100)", maxLength: 100, nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Lessons", x => x.Id);
+                    table.PrimaryKey("PK_Module", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Lessons_Events_EventId",
-                        column: x => x.EventId,
-                        principalTable: "Events",
+                        name: "FK_Module_Fase_FaseId",
+                        column: x => x.FaseId,
+                        principalTable: "Fase",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -124,6 +159,7 @@ namespace AEFWeb.Data.Migrations
                 {
                     Id = table.Column<Guid>(nullable: false),
                     Content = table.Column<string>(type: "varchar(max)", maxLength: 100, nullable: false),
+                    Deleted = table.Column<bool>(nullable: false),
                     MainImage = table.Column<string>(type: "varchar(150)", maxLength: 50, nullable: true),
                     PublicationDate = table.Column<DateTime>(nullable: false),
                     SubTitle = table.Column<string>(type: "varchar(500)", maxLength: 100, nullable: false),
@@ -139,6 +175,36 @@ namespace AEFWeb.Data.Migrations
                         principalTable: "Users",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Lessons",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(nullable: false),
+                    Code = table.Column<int>(nullable: false),
+                    Deleted = table.Column<bool>(nullable: false),
+                    Description = table.Column<string>(type: "varchar(1000)", maxLength: 100, nullable: true),
+                    ModuleId = table.Column<Guid>(nullable: true),
+                    SpecialWeekId = table.Column<Guid>(nullable: true),
+                    SubTitle = table.Column<string>(type: "varchar(100)", maxLength: 100, nullable: true),
+                    Title = table.Column<string>(type: "varchar(100)", maxLength: 100, nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Lessons", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Lessons_Module_ModuleId",
+                        column: x => x.ModuleId,
+                        principalTable: "Module",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Lessons_SpecialWeek_SpecialWeekId",
+                        column: x => x.SpecialWeekId,
+                        principalTable: "SpecialWeek",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -165,10 +231,46 @@ namespace AEFWeb.Data.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
+            migrationBuilder.CreateTable(
+                name: "Events",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(nullable: false),
+                    Deleted = table.Column<bool>(nullable: false),
+                    EndDate = table.Column<DateTime>(nullable: false),
+                    LessonId = table.Column<Guid>(nullable: false),
+                    StartDate = table.Column<DateTime>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Events", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Events_Lessons_LessonId",
+                        column: x => x.LessonId,
+                        principalTable: "Lessons",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
             migrationBuilder.CreateIndex(
-                name: "IX_Lessons_EventId",
+                name: "IX_Events_LessonId",
+                table: "Events",
+                column: "LessonId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Lessons_ModuleId",
                 table: "Lessons",
-                column: "EventId");
+                column: "ModuleId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Lessons_SpecialWeekId",
+                table: "Lessons",
+                column: "SpecialWeekId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Module_FaseId",
+                table: "Module",
+                column: "FaseId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Posts_UserId",
@@ -193,13 +295,16 @@ namespace AEFWeb.Data.Migrations
                 name: "EventLog");
 
             migrationBuilder.DropTable(
-                name: "Lessons");
+                name: "Events");
 
             migrationBuilder.DropTable(
                 name: "PostTag");
 
             migrationBuilder.DropTable(
-                name: "Events");
+                name: "SystemConfiguration");
+
+            migrationBuilder.DropTable(
+                name: "Lessons");
 
             migrationBuilder.DropTable(
                 name: "Posts");
@@ -208,7 +313,16 @@ namespace AEFWeb.Data.Migrations
                 name: "Tags");
 
             migrationBuilder.DropTable(
+                name: "Module");
+
+            migrationBuilder.DropTable(
+                name: "SpecialWeek");
+
+            migrationBuilder.DropTable(
                 name: "Users");
+
+            migrationBuilder.DropTable(
+                name: "Fase");
         }
     }
 }

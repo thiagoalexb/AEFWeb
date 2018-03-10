@@ -11,9 +11,6 @@ namespace AEFWeb.Data.Configurations
         {
             builder.Property(c => c.Id);
 
-            builder.Property(c => c.Schedule)
-                .IsRequired();
-
             builder.Property(c => c.Title)
                 .HasColumnType("varchar(100)")
                 .HasMaxLength(100)
@@ -23,9 +20,18 @@ namespace AEFWeb.Data.Configurations
                .HasColumnType("varchar(100)")
                .HasMaxLength(100);
 
-            builder.HasOne(x => x.Event)
-                .WithMany(x => x.Lessons)
-                .OnDelete(DeleteBehavior.Cascade);
+            builder.Property(c => c.Description)
+               .HasColumnType("varchar(1000)")
+               .HasMaxLength(100);
+
+            builder.HasOne(x => x.Module)
+                .WithMany(x => x.Lessons);
+
+            builder.HasOne(x => x.SpecialWeek)
+                .WithMany(x => x.Lessons);
+
+            builder.HasMany(x => x.Events)
+                .WithOne(x => x.Lesson);
         }
     }
 }

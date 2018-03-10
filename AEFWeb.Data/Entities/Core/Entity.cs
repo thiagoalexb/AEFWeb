@@ -10,5 +10,6 @@ namespace AEFWeb.Data.Entities.Core
         }
 
         public Guid Id { get; private set; }
+        public bool Deleted { get; set; }
     }
 }
