@@ -87,5 +87,33 @@ namespace AEFWeb.Implementation.Properties {
                 return ResourceManager.GetString("ConfirmEmailTemplate", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &lt;!DOCTYPE html&gt;
+        ///&lt;html lang=&quot;pt-br&quot;&gt;
+        ///&lt;head&gt;
+        ///    &lt;meta charset=&quot;utf-8&quot; /&gt;
+        ///    &lt;title&gt;&lt;/title&gt;
+        ///&lt;/head&gt;
+        ///&lt;body&gt;
+        ///    &lt;div&gt;
+        ///        &lt;h2&gt;AEF!&lt;/h2&gt;
+        ///
+        ///        &lt;br/&gt;
+        ///
+        ///        Para recuperar sua senha &lt;a href=&quot;{Url}&quot;&gt;Click aqui.&lt;/a&gt;
+        ///
+        ///        &lt;br /&gt;
+        ///
+        ///        Obrigado!
+        ///    &lt;/div&gt;
+        ///&lt;/body&gt;
+        ///&lt;/html&gt;.
+        /// </summary>
+        public static string RecoverPasswordTemplate {
+            get {
+                return ResourceManager.GetString("RecoverPasswordTemplate", resourceCulture);
+            }
+        }
     }
 }

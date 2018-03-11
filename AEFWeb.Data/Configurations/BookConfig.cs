@@ -2,9 +2,6 @@
 using AEFWeb.Data.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace AEFWeb.Data.Configurations
 {
@@ -35,6 +32,8 @@ namespace AEFWeb.Data.Configurations
             builder.Property(c => c.IsSale);
 
             builder.Property(c => c.Value);
+
+            builder.Property(c => c.Deleted);
         }
     }
 }

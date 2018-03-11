@@ -30,7 +30,6 @@ namespace AEFWeb.Api.IoC
 
             //Services
             services.AddScoped<IUserService, UserService>();
-            services.AddScoped<ITagService, TagService>();
             services.AddScoped<IPostService, PostService>();
             services.AddScoped<IBookService, BookService>();
             services.AddScoped<IEventService, EventService>();

@@ -18,6 +18,10 @@ namespace AEFWeb.Core.ViewModels
         [Compare("Password", ErrorMessage = "Senha e Confirmação de senha devem ser iguais")]
         public string ConfirmPassword { get; set; }
 
+        public string FirstName { get; set; }
+
+        public string LastName { get; set; }
+
         public bool IsVerified { get; set; }
     }
 }

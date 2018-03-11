@@ -1,7 +1,6 @@
 ﻿using AEFWeb.Implementation.Notifications;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 
@@ -28,27 +27,29 @@ namespace AEFWeb.Api.Controllers.Base
                     data = result
                 });
             }
-
+            
             return BadRequest(new
             {
                 success = false,
-                errors = _notifications.GetNotifications().Select(n => n.Message)
-            });
+                errors = _notifications.GetNotifications().ToDictionary(s => s.Source, s => s.Message)
+        });
         }
 
         protected void NotifyModelStateErrors()
         {
-            var erros = ModelState.Values.SelectMany(v => v.Errors);
-            foreach (var erro in erros)
+            var values = ModelState.Values.ToList();
+            foreach (var value in values)
             {
-                var erroMsg = erro.Exception == null ? erro.ErrorMessage : erro.Exception.Message;
-                NotifyError(string.Empty, erroMsg);
+                var error = value.Errors.FirstOrDefault();
+                var erroMsg = error.Exception == null ? error.ErrorMessage : error.Exception.Message;
+                var key = value.GetType().GetProperty("Key")?.GetValue(value)?.ToString();
+                NotifyError(string.Empty, key, erroMsg);
             }
         }
 
-        protected void NotifyError(string code, string message)
+        protected void NotifyError(string code, string source, string message)
         {
-            _notifications.Handle(new Notification(message), new CancellationToken());
+            _notifications.Handle(new Notification(source, message), new CancellationToken());
         }
     }
 }

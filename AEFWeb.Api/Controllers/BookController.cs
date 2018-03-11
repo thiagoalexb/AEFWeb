@@ -4,6 +4,7 @@ using AEFWeb.Core.Services;
 using AEFWeb.Core.ViewModels;
 using AEFWeb.Implementation.Notifications;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
 
@@ -11,6 +12,7 @@ namespace AEFWeb.Api.Controllers
 {
     [Produces("application/json")]
     [Route("api/Book")]
+    //[Authorize("Bearer")]
     public class BookController : BaseController
     {
         private readonly IBookService _bookService;
@@ -67,6 +69,16 @@ namespace AEFWeb.Api.Controllers
         public IActionResult Delete([FromBody]BookViewModel entity)
         {
             _bookService.Remove(entity);
+
+            return Response();
+        }
+
+        [HttpPatch]
+        [Route("restore")]
+        [TokenUpdateFilter]
+        public IActionResult Restore([FromBody]BookViewModel entity)
+        {
+            _bookService.Restore(entity);
 
             return Response();
         }

@@ -19,6 +19,8 @@ namespace AEFWeb.Data.Configurations
 
             builder.HasOne(c => c.Lesson)
                 .WithMany(c => c.Events);
+
+            builder.Property(c => c.Deleted);
         }
     }
 }

@@ -32,6 +32,8 @@ namespace AEFWeb.Data.Configurations
             builder.Property(c => c.UpdateDate);
 
             builder.Property(c => c.UpdatedUserId);
+
+            builder.Property(c => c.Deleted);
         }
     }
 }

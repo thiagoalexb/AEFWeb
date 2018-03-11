@@ -9,5 +9,7 @@ namespace AEFWeb.Core.ViewModels.Core
 
         public DateTime? LastUpdateDate { get; set; }
         public Guid? LastUpdatedUserId { get; set; }
+
+        public bool Deleted { get; set; } = false;
     }
 }

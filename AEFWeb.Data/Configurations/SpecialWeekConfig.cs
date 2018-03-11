@@ -23,6 +23,8 @@ namespace AEFWeb.Data.Configurations
 
             builder.HasMany(x => x.Lessons)
                 .WithOne(x => x.SpecialWeek);
+
+            builder.Property(c => c.Deleted);
         }
     }
 }

@@ -1,8 +1,10 @@
 ﻿using AEFWeb.Api.Controllers.Base;
+using AEFWeb.Api.Filters;
 using AEFWeb.Core.Services;
 using AEFWeb.Core.ViewModels;
 using AEFWeb.Implementation.Notifications;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
 
@@ -10,6 +12,7 @@ namespace AEFWeb.Api.Controllers
 {
     [Produces("application/json")]
     [Route("api/Post")]
+    //[Authorize("Bearer")]
     public class PostController : BaseController
     {
         private readonly IPostService _postService;
@@ -34,6 +37,7 @@ namespace AEFWeb.Api.Controllers
 
         [HttpPost]
         [Route("add")]
+        [TokenAddFilter]
         public IActionResult Post([FromBody]PostViewModel entity)
         {
             if (!ModelState.IsValid)
@@ -47,6 +51,7 @@ namespace AEFWeb.Api.Controllers
 
         [HttpPut]
         [Route("update")]
+        [TokenUpdateFilter]
         public IActionResult Put([FromBody]PostViewModel entity)
         {
             if (!ModelState.IsValid)
@@ -60,9 +65,20 @@ namespace AEFWeb.Api.Controllers
 
         [HttpDelete]
         [Route("delete")]
+        [TokenUpdateFilter]
         public IActionResult Delete([FromBody]PostViewModel entity)
         {
             _postService.Remove(entity);
+
+            return Response();
+        }
+
+        [HttpPatch]
+        [Route("restore")]
+        [TokenUpdateFilter]
+        public IActionResult Restore([FromBody]PostViewModel entity)
+        {
+            _postService.Restore(entity);
 
             return Response();
         }

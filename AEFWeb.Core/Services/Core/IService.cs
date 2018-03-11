@@ -11,5 +11,6 @@ namespace AEFWeb.Core.Services.Core
         void Add(TViewModel viewModel);
         void Update(TViewModel viewModel);
         void Remove(TViewModel viewModel);
+        void Restore(TViewModel viewModel);
     }
 }

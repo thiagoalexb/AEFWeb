@@ -25,7 +25,7 @@ namespace AEFWeb.Implementation.Services.Core
         {
             if (!_unitOfWork.Complete())
             {
-                _bus.RaiseEvent(new Notification("Erro ao salvar, tente novamente."));
+                _bus.RaiseEvent(new Notification("defaultError", "Erro ao salvar, tente novamente."));
                 return false;
             }
             return true;

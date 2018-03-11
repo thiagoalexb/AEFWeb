@@ -22,21 +22,16 @@ namespace AEFWeb.Api.Filters
 
         private dynamic SetValues(ActionExecutingContext filterContext, dynamic model)
         {
-            var path = filterContext.HttpContext.Request.Path.Value;
-            var split = path.Split('/').Where(x => !string.IsNullOrWhiteSpace(x)).ToList();
-            if (split.LastOrDefault().Contains("add"))
+            try
             {
-                try
-                {
-                    model.CreatorUserId = ManageToken.GetToken(filterContext.HttpContext.Request);
-                }
-                catch { }
-                try
-                {
-                    model.CreationDate = DateTime.Now;
-                }
-                catch { }
+                model.CreatorUserId = ManageToken.GetToken(filterContext.HttpContext.Request);
             }
+            catch { }
+            try
+            {
+                model.CreationDate = DateTime.Now;
+            }
+            catch { }
             return model;
         }
     }

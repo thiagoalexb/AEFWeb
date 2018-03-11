@@ -11,8 +11,8 @@ using System;
 namespace AEFWeb.Data.Migrations
 {
     [DbContext(typeof(AEFContext))]
-    [Migration("20180310205153_first")]
-    partial class first
+    [Migration("20180310233021_first_migration")]
+    partial class first_migration
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {

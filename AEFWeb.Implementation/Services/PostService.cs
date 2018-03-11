@@ -79,16 +79,18 @@ namespace AEFWeb.Implementation.Services
                     else
                     {
                         _unitOfWork.EndTransaction();
+                        _bus.RaiseEvent(new Notification("defaultError", "Erro inesperado, tente novamente!"));
                     }
                 }
                 else
                 {
                     _unitOfWork.EndTransaction();
+                    _bus.RaiseEvent(new Notification("defaultError", "Erro inesperado, tente novamente!"));
                 }
             }
             else
             {
-                _bus.RaiseEvent(new Notification("Post não encontrado"));
+                _bus.RaiseEvent(new Notification("defaultError", "Post não encontrado"));
             }
 
         }
@@ -96,11 +98,19 @@ namespace AEFWeb.Implementation.Services
         public void Remove(PostViewModel viewModel)
         {
             var post = _repository.Get(viewModel.Id);
-            var postTag = _postTagRepository.Find(x => x.PostId == viewModel.Id);
-            _postTagRepository.RemoveRange(postTag);
-            _repository.Remove(post);
+            post.SetDeleted(true);
+
             if (Commit())
                 RegisterLog(new EventLog(Guid.NewGuid(), null, null, viewModel.LastUpdateDate, viewModel.LastUpdatedUserId, JsonConvert.SerializeObject(viewModel), Type, "Remove"));
+        }
+
+        public void Restore(PostViewModel viewModel)
+        {
+            var post = _repository.Get(viewModel.Id);
+            post.SetDeleted(false);
+
+            if (Commit())
+                RegisterLog(new EventLog(Guid.NewGuid(), null, null, viewModel.LastUpdateDate, viewModel.LastUpdatedUserId, JsonConvert.SerializeObject(viewModel), Type, "Restore"));
         }
     }
 }

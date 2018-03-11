@@ -19,13 +19,16 @@ namespace AEFWeb.Api.Security
             try
             {
                 var dates = GetDates(tokenConfigurations);
+                userViewModel.Password = null;
+                userViewModel.ConfirmPassword = null;
                 return new
                 {
                     authenticated = true,
                     created = dates.dataCriacao.ToString("yyyy-MM-dd HH:mm:ss"),
                     expiration = dates.dataExpiracao.ToString("yyyy-MM-dd HH:mm:ss"),
                     accessToken = GenerateSecurityToken(tokenConfigurations, signingConfigurations, userViewModel, dates),
-                    message = "OK"
+                    message = "OK",
+                    user = userViewModel
                 };
             }
             catch

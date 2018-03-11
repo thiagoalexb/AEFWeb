@@ -32,6 +32,8 @@ namespace AEFWeb.Data.Configurations
 
             builder.Property(c => c.DateOfBirth)
                 .IsRequired();
+
+            builder.Property(c => c.Deleted);
         }
     }
 }

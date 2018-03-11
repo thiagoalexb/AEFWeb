@@ -31,11 +31,6 @@ namespace AEFWeb.Implementation.Services
         public void Add(BookViewModel viewModel)
         {
             viewModel.Id = Guid.NewGuid();
-            if (_repository.Find(x => x.Title.ToLower() == viewModel.Title.ToLower()).Count() > 0)
-            {
-                _bus.RaiseEvent(new Notification("Este Título já está cadastrado"));
-                return;
-            }
             var book = _mapper.Map<Book>(viewModel);
             _repository.Add(book);
 
@@ -49,12 +44,6 @@ namespace AEFWeb.Implementation.Services
 
             if (book != null)
             {
-                if (book.Id != viewModel.Id && _repository.Find(x => x.Title.ToLower() == viewModel.Title.ToLower()).Count() > 0)
-                {
-                    _bus.RaiseEvent(new Notification("Este Título já está cadastrado"));
-                    return;
-                }
-
                 _mapper.Map(viewModel, book);
 
                 if (Commit())
@@ -62,17 +51,26 @@ namespace AEFWeb.Implementation.Services
             }
             else
             {
-                _bus.RaiseEvent(new Notification("Título não encontrado"));
+                _bus.RaiseEvent(new Notification("defaultError", "Título não encontrado"));
             }
         }
 
         public void Remove(BookViewModel viewModel)
         {
             var book = _repository.Get(viewModel.Id);
-            _repository.Remove(book);
+            book.SetDeleted(true);
 
             if (Commit())
                 RegisterLog(new EventLog(Guid.NewGuid(), null, null, viewModel.LastUpdateDate, viewModel.LastUpdatedUserId, JsonConvert.SerializeObject(viewModel), Type, "Remove"));
+        }
+
+        public void Restore(BookViewModel viewModel)
+        {
+            var book = _repository.Get(viewModel.Id);
+            book.SetDeleted(false);
+
+            if (Commit())
+                RegisterLog(new EventLog(Guid.NewGuid(), null, null, viewModel.LastUpdateDate, viewModel.LastUpdatedUserId, JsonConvert.SerializeObject(viewModel), Type, "Restore"));
         }
     }
 }

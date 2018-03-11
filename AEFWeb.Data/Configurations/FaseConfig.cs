@@ -18,6 +18,8 @@ namespace AEFWeb.Data.Configurations
 
             builder.HasMany(x => x.Modules)
                 .WithOne(x => x.Fase);
+
+            builder.Property(c => c.Deleted);
         }
     }
 }

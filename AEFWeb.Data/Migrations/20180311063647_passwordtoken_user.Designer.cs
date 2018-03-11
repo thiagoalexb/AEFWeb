@@ -11,9 +11,10 @@ using System;
 namespace AEFWeb.Data.Migrations
 {
     [DbContext(typeof(AEFContext))]
-    partial class AEFContextModelSnapshot : ModelSnapshot
+    [Migration("20180311063647_passwordtoken_user")]
+    partial class passwordtoken_user
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

@@ -11,6 +11,7 @@ namespace AEFWeb.Api.Controllers
 {
     [Produces("application/json")]
     [Route("api/Event")]
+    //[Authorize("Bearer")]
     public class EventController : BaseController
     {
         private readonly IEventService _eventService;
@@ -68,6 +69,16 @@ namespace AEFWeb.Api.Controllers
         public IActionResult Delete([FromBody]EventViewModel entity)
         {
             _eventService.Remove(entity);
+
+            return Response();
+        }
+
+        [HttpPatch]
+        [Route("restore")]
+        [TokenUpdateFilter]
+        public IActionResult Restore([FromBody]EventViewModel entity)
+        {
+            _eventService.Restore(entity);
 
             return Response();
         }

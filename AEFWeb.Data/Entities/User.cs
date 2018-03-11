@@ -29,11 +29,17 @@ namespace AEFWeb.Data.Entities
         public string Password { get; private set; }
         public DateTime DateOfBirth { get; private set; }
         public bool IsVerified { get; private set; }
+        public Guid? PasswordChangeToken { get; private set; }
 
         public void SetPassword(string password)
         {
             Password = password;
             IsVerified = true;
+        }
+
+        public void SetPasswordChangeToken(Guid? token)
+        {
+            PasswordChangeToken = token;
         }
     }
 }

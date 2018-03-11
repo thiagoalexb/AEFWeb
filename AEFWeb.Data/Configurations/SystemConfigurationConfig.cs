@@ -20,6 +20,8 @@ namespace AEFWeb.Data.Configurations
                 .HasColumnType("varchar(100)")
                 .HasMaxLength(100)
                 .IsRequired();
+
+            builder.Property(c => c.Deleted);
         }
     }
 }

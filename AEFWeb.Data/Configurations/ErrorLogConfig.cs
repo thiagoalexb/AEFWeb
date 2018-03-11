@@ -21,6 +21,8 @@ namespace AEFWeb.Data.Configurations
 
             builder.Property(c => c.Date)
                 .IsRequired();
+
+            builder.Property(c => c.Deleted);
         }
     }
 }

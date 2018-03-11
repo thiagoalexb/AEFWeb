@@ -34,6 +34,8 @@ namespace AEFWeb.Data.Configurations
                 .IsRequired();
 
             builder.HasOne(x => x.User);
+
+            builder.Property(c => c.Deleted);
         }
     }
 }

@@ -109,9 +109,20 @@ namespace AEFWeb.Implementation.Services
 
         public void Remove(EventViewModel viewModel)
         {
-            _repository.Remove(_repository.Get(viewModel.Id));
+            var @event = _repository.Get(viewModel.Id);
+            @event.SetDeleted(true);
+
             if (Commit())
                 RegisterLog(new EventLog(Guid.NewGuid(), null, null, viewModel.LastUpdateDate, viewModel.LastUpdatedUserId, JsonConvert.SerializeObject(viewModel), Type, "Remove"));
+        }
+
+        public void Restore(EventViewModel viewModel)
+        {
+            var @event = _repository.Get(viewModel.Id);
+            @event.SetDeleted(false);
+
+            if (Commit())
+                RegisterLog(new EventLog(Guid.NewGuid(), null, null, viewModel.LastUpdateDate, viewModel.LastUpdatedUserId, JsonConvert.SerializeObject(viewModel), Type, "Restore"));
         }
     }
 }

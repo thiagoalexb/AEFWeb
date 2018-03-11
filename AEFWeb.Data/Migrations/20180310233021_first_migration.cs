@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace AEFWeb.Data.Migrations
 {
-    public partial class first : Migration
+    public partial class first_migration : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
