@@ -16,6 +16,7 @@ namespace AEFWeb.Core.ViewModels
             Content = content;
             PublicationDate = publicationDate;
             UserId = userId;
+            Tags = new List<TagViewModel>();
         }
 
         public Guid Id { get; set; }

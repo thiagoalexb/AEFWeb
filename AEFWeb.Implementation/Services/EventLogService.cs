@@ -2,6 +2,7 @@
 using AEFWeb.Core.Services;
 using AEFWeb.Core.UnitOfWork;
 using AEFWeb.Data.Entities;
+using System.Threading.Tasks;
 
 namespace AEFWeb.Implementation.Services
 {
@@ -16,10 +17,10 @@ namespace AEFWeb.Implementation.Services
             _eventLogRepository = eventLogRepository;
         }
 
-        public void Add(EventLog entity)
+        public async Task Add(EventLog entity)
         {
-            _eventLogRepository.Add(entity);
-            _unitOfWork.Complete();
+            await _eventLogRepository.Add(entity);
+            await _unitOfWork.Complete();
         }
     }
 }

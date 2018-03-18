@@ -1,16 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace AEFWeb.Core.Services.Core
 {
     public interface IService<TViewModel> where TViewModel : class
     {
-        TViewModel Get(Guid id);
-        IEnumerable<TViewModel> GetAll();
+        Task<TViewModel> Get(Guid id);
+        Task<IEnumerable<TViewModel>> GetAll();
 
-        void Add(TViewModel viewModel);
-        void Update(TViewModel viewModel);
-        void Remove(TViewModel viewModel);
-        void Restore(TViewModel viewModel);
+        Task Add(TViewModel viewModel);
+        Task Update(TViewModel viewModel);
+        Task Remove(TViewModel viewModel);
+        Task Restore(TViewModel viewModel);
     }
 }

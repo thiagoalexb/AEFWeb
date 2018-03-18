@@ -21,10 +21,9 @@ namespace AEFWeb.Implementation.Services
             _emailSettings = emailSettings.Value;
         }
 
-        public Task SendEmailAsync(string email, string subject, string message)
+        public async Task SendEmailAsync(string email, string subject, string message)
         {
-            Execute(email, subject, message).Wait();
-            return Task.FromResult(0);
+            await Execute(email, subject, message);
         }
 
         public async Task Execute(string email, string subject, string message)

@@ -24,14 +24,14 @@ namespace AEFWeb.Api.Controllers
 
         [HttpGet]
         [Route("get-all")]
-        public IActionResult Get() => Ok(_userService.GetAll());
+        public async Task<IActionResult> Get() => Ok(await _userService.GetAll());
 
         [HttpGet]
         [Route("get-by-id")]
-        public IActionResult Get(Guid id)
+        public async Task<IActionResult> Get(Guid id)
         {
             if (id == Guid.Empty) return NotFound();
-            var user = _userService.Get(id);
+            var user = await _userService.Get(id);
             if (user == null) return NotFound();
             return Response(user);
         }
@@ -39,37 +39,37 @@ namespace AEFWeb.Api.Controllers
         [HttpPost]
         [Route("add")]
         [TokenAddFilter]
-        public IActionResult Post([FromBody]UserViewModel entity)
+        public async Task<IActionResult> Post([FromBody]UserViewModel entity)
         {
             if (!ModelState.IsValid)
             {
                 NotifyModelStateErrors();
                 return Response(entity);
             }
-            _userService.Add(entity);
+            await _userService.Add(entity);
             return Response(entity);
         }
 
         [HttpPut]
         [Route("update")]
         [TokenUpdateFilter]
-        public IActionResult Put([FromBody]UserViewModel entity)
+        public async Task<IActionResult> Put([FromBody]UserViewModel entity)
         {
             if (!ModelState.IsValid)
             {
                 NotifyModelStateErrors();
                 return Response(entity);
             }
-            _userService.Update(entity);
+            await _userService.Update(entity);
             return Response(entity);
         }
 
         [HttpDelete]
         [Route("delete")]
         [TokenUpdateFilter]
-        public IActionResult Delete([FromBody]UserViewModel entity)
+        public async Task<IActionResult> Delete([FromBody]UserViewModel entity)
         {
-            _userService.Remove(entity);
+            await _userService.Remove(entity);
 
             return Response();
         }
@@ -77,9 +77,9 @@ namespace AEFWeb.Api.Controllers
         [HttpPatch]
         [Route("restore")]
         [TokenUpdateFilter]
-        public IActionResult Restore([FromBody]UserViewModel entity)
+        public async Task<IActionResult> Restore([FromBody]UserViewModel entity)
         {
-            _userService.Restore(entity);
+            await _userService.Restore(entity);
 
             return Response();
         }
@@ -87,9 +87,9 @@ namespace AEFWeb.Api.Controllers
         [HttpGet]
         [Route("verify-password")]
         [AllowAnonymous]
-        public IActionResult VerifyPassword(string email)
+        public async Task<IActionResult> VerifyPassword(string email)
         {
-            var user = _userService.GetByEmail(email);
+            var user = await _userService.GetByEmail(email);
             if (user == null) return Response(new { message = $"Este email: {email} não está cadastrado no nosso banco de dados" });
             return Response(new { userId = user.Id, isVerified = user.IsVerified });
         }
@@ -97,25 +97,25 @@ namespace AEFWeb.Api.Controllers
         [HttpPost]
         [Route("update-password")]
         [AllowAnonymous]
-        public IActionResult UpdatePassword([FromBody]UserUpdatePasswordViewModel entity)
+        public async Task<IActionResult> UpdatePassword([FromBody]UserUpdatePasswordViewModel entity)
         {
             if (!ModelState.IsValid)
             {
                 NotifyModelStateErrors();
                 return Response(entity);
             }
-            var user = _userService.UpdatePassword(entity);
+            var user = await _userService.UpdatePassword(entity);
             return Response(user);
         }
 
         [HttpGet]
         [Route("recover-password")]
         [AllowAnonymous]
-        public IActionResult RecoverPassword(string email)
+        public async Task<IActionResult> RecoverPassword(string email)
         {
-            var user = _userService.GetByEmail(email);
+            var user = await _userService.GetByEmail(email);
             if (user == null) return Response(new { message = $"Este email: {email} não está cadastrado no nosso banco de dados" });
-            _userService.SendRecoverPassword(user.Id);
+            await _userService.SendRecoverPassword(user.Id);
             return Response();
         }
 
@@ -127,7 +127,7 @@ namespace AEFWeb.Api.Controllers
         {
             if(token == Guid.Empty)
                 return Response(new { message = "Digito verificador inválido" });
-            var userByEmail = _userService.GetByEmail(email);
+            var userByEmail = await _userService.GetByEmail(email);
             if (userByEmail == null)
                 return Response(new { message = $"Este email: {email} não está cadastrado no nosso banco de dados" });
             var user = await _userService.GetByPasswordToken(token, email);

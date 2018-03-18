@@ -6,6 +6,7 @@ using AEFWeb.Implementation.Notifications;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Threading.Tasks;
 
 namespace AEFWeb.Api.Controllers
 {
@@ -22,7 +23,7 @@ namespace AEFWeb.Api.Controllers
         [AllowAnonymous]
         [HttpPost]
         [Route("login")]
-        public object Login(
+        public async Task<object> Login(
             [FromBody] LoginViewModel loginViewModel,
             [FromServices]SigningConfigurations signingConfigurations,
             [FromServices]TokenConfigurations tokenConfigurations)
@@ -33,7 +34,7 @@ namespace AEFWeb.Api.Controllers
                 return Response(loginViewModel);
             }
 
-            var user = _userService.GetByEmail(loginViewModel.Email);
+            var user = await _userService.GetByEmail(loginViewModel.Email);
 
             if (user == null) return new { authenticated = false, message = "Usuário não encontrado" };
 

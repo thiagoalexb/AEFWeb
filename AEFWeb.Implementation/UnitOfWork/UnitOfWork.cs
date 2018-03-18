@@ -3,8 +3,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 using System;
 using System.Collections;
-using System.Data;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace AEFWeb.Implementation.UnitOfWork
 {
@@ -40,9 +40,9 @@ namespace AEFWeb.Implementation.UnitOfWork
             return (TEntity)repositories[type];
         }
 
-        public bool Complete()
+        public async Task<bool> Complete()
         {
-            var isSaved = _context.SaveChanges() > 0;
+            var isSaved = await _context.SaveChangesAsync() > 0;
             return isSaved;
         }
 

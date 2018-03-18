@@ -1,7 +1,9 @@
-﻿namespace AEFWeb.Core.Services.Core
+﻿using System.Threading.Tasks;
+
+namespace AEFWeb.Core.Services.Core
 {
     public interface IServiceLog<TEntity> where TEntity : class
     {
-        void Add(TEntity entity);
+        Task Add(TEntity entity);
     }
 }

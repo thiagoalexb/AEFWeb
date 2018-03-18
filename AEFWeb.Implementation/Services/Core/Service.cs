@@ -3,6 +3,7 @@ using AEFWeb.Core.UnitOfWork;
 using AEFWeb.Data.Entities;
 using AEFWeb.Implementation.Notifications;
 using System;
+using System.Threading.Tasks;
 
 namespace AEFWeb.Implementation.Services.Core
 {
@@ -21,19 +22,19 @@ namespace AEFWeb.Implementation.Services.Core
             _repository = _unitOfWork.Repository<TRepository>();
         }
 
-        protected bool Commit()
+        protected async Task<bool> Commit()
         {
-            if (!_unitOfWork.Complete())
+            if (! await _unitOfWork.Complete())
             {
-                _bus.RaiseEvent(new Notification("defaultError", "Erro ao salvar, tente novamente."));
+                await _bus.RaiseEvent(new Notification("defaultError", "Erro ao salvar, tente novamente."));
                 return false;
             }
             return true;
         }
 
-        public void RegisterLog(EventLog log)
+        public async Task RegisterLog(EventLog log)
         {
-            _bus.RaiseEventLog(log);
+            await _bus.RaiseEventLog(log);
         }
     }
 }

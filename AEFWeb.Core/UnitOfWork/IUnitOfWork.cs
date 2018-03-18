@@ -1,11 +1,12 @@
 ﻿using AEFWeb.Core.Repositories.Core;
 using System;
+using System.Threading.Tasks;
 
 namespace AEFWeb.Core.UnitOfWork
 {
     public interface IUnitOfWork : IDisposable
     {
-        bool Complete();
+        Task<bool> Complete();
         TEntity Repository<TEntity>() where TEntity : class;
         void BeginTransaction();
         void EndTransaction();

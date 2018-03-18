@@ -4,6 +4,8 @@ using AEFWeb.Data.Entities;
 using AEFWeb.Implementation.Repositories.Core;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
+using System.Threading.Tasks;
+using System.Collections.Generic;
 
 namespace AEFWeb.Implementation.Repositories
 {
@@ -12,9 +14,14 @@ namespace AEFWeb.Implementation.Repositories
         public PostTagRepository(DbContext context) : base(context)
         { }
 
-        public PostTag Get(Guid postId, Guid tagId)
+        public async Task<PostTag> Get(Guid postId, Guid tagId)
         {
-            return DbSet.FirstOrDefault(x => x.PostId == postId && x.TagId == tagId);
+            return await DbSet.FirstOrDefaultAsync(x => x.PostId == postId && x.TagId == tagId);
+        }
+
+        public void RemoveRange(IEnumerable<PostTag> list)
+        {
+            DbSet.RemoveRange(list);
         }
     }
 }

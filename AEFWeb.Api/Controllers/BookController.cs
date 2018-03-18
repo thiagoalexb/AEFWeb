@@ -7,6 +7,7 @@ using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
+using System.Threading.Tasks;
 
 namespace AEFWeb.Api.Controllers
 {
@@ -23,14 +24,14 @@ namespace AEFWeb.Api.Controllers
 
         [HttpGet]
         [Route("get-all")]
-        public IActionResult Get() => Ok(_bookService.GetAll());
+        public async Task<IActionResult> Get() => Ok(await _bookService.GetAll());
 
         [HttpGet]
         [Route("get-by-id")]
-        public IActionResult Get(Guid id)
+        public async Task<IActionResult> Get(Guid id)
         {
             if (id == Guid.Empty) return NotFound();
-            var book = _bookService.Get(id);
+            var book = await _bookService.Get(id);
             if (book == null) return NotFound();
             return Response(book);
         }
@@ -38,37 +39,37 @@ namespace AEFWeb.Api.Controllers
         [HttpPost]
         [Route("add")]
         [TokenAddFilter]
-        public IActionResult Post([FromBody]BookViewModel entity)
+        public async Task<IActionResult> Post([FromBody]BookViewModel entity)
         {
             if (!ModelState.IsValid)
             {
                 NotifyModelStateErrors();
                 return Response(entity);
             }
-            _bookService.Add(entity);
+            await _bookService.Add(entity);
             return Response(entity);
         }
 
         [HttpPut]
         [Route("update")]
         [TokenUpdateFilter]
-        public IActionResult Put([FromBody]BookViewModel entity)
+        public async Task<IActionResult> Put([FromBody]BookViewModel entity)
         {
             if (!ModelState.IsValid)
             {
                 NotifyModelStateErrors();
                 return Response(entity);
             }
-            _bookService.Update(entity);
+            await _bookService.Update(entity);
             return Response(entity);
         }
 
         [HttpDelete]
         [Route("delete")]
         [TokenUpdateFilter]
-        public IActionResult Delete([FromBody]BookViewModel entity)
+        public async Task<IActionResult> Delete([FromBody]BookViewModel entity)
         {
-            _bookService.Remove(entity);
+            await _bookService.Remove(entity);
 
             return Response();
         }
@@ -76,9 +77,9 @@ namespace AEFWeb.Api.Controllers
         [HttpPatch]
         [Route("restore")]
         [TokenUpdateFilter]
-        public IActionResult Restore([FromBody]BookViewModel entity)
+        public async Task<IActionResult> Restore([FromBody]BookViewModel entity)
         {
-            _bookService.Restore(entity);
+            await _bookService.Restore(entity);
 
             return Response();
         }

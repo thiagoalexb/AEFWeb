@@ -4,6 +4,7 @@ using AEFWeb.Core.Services;
 using AEFWeb.Core.UnitOfWork;
 using AEFWeb.Data.Entities;
 using AEFWeb.Implementation.Services.Core;
+using System.Threading.Tasks;
 
 namespace AEFWeb.Implementation.Services
 {
@@ -12,10 +13,10 @@ namespace AEFWeb.Implementation.Services
         public ErrorLogService(IMediatorHandler bus, IUnitOfWork unitOfWork) 
                                 : base(bus, unitOfWork) { }
         
-        public void Add(ErrorLog entity)
+        public async Task Add(ErrorLog entity)
         {
-            _repository.Add(entity);
-            _unitOfWork.Complete();
+            await _repository.Add(entity);
+            await _unitOfWork.Complete();
         }
     }
 }

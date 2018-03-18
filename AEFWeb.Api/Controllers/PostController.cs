@@ -7,6 +7,7 @@ using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
+using System.Threading.Tasks;
 
 namespace AEFWeb.Api.Controllers
 {
@@ -23,14 +24,14 @@ namespace AEFWeb.Api.Controllers
 
         [HttpGet]
         [Route("get-all")]
-        public IActionResult Get() => Ok(_postService.GetAll());
+        public async Task<IActionResult> Get() => Ok(await _postService.GetAll());
 
         [HttpGet]
         [Route("get-by-id")]
-        public IActionResult Get(Guid id)
+        public async Task<IActionResult> Get(Guid id)
         {
             if (id == Guid.Empty) return NotFound();
-            var post = _postService.Get(id);
+            var post = await _postService.Get(id);
             if (post == null) return NotFound();
             return Response(post);
         }
@@ -38,37 +39,37 @@ namespace AEFWeb.Api.Controllers
         [HttpPost]
         [Route("add")]
         [TokenAddFilter]
-        public IActionResult Post([FromBody]PostViewModel entity)
+        public async Task<IActionResult> Post([FromBody]PostViewModel entity)
         {
             if (!ModelState.IsValid)
             {
                 NotifyModelStateErrors();
                 return Response(entity);
             }
-            _postService.Add(entity);
+            await _postService.Add(entity);
             return Response(entity);
         }
 
         [HttpPut]
         [Route("update")]
         [TokenUpdateFilter]
-        public IActionResult Put([FromBody]PostViewModel entity)
+        public async Task<IActionResult> Put([FromBody]PostViewModel entity)
         {
             if (!ModelState.IsValid)
             {
                 NotifyModelStateErrors();
                 return Response(entity);
             }
-            _postService.Update(entity);
+            await _postService.Update(entity);
             return Response(entity);
         }
 
         [HttpDelete]
         [Route("delete")]
         [TokenUpdateFilter]
-        public IActionResult Delete([FromBody]PostViewModel entity)
+        public async Task<IActionResult> Delete([FromBody]PostViewModel entity)
         {
-            _postService.Remove(entity);
+            await _postService.Remove(entity);
 
             return Response();
         }
@@ -76,9 +77,9 @@ namespace AEFWeb.Api.Controllers
         [HttpPatch]
         [Route("restore")]
         [TokenUpdateFilter]
-        public IActionResult Restore([FromBody]PostViewModel entity)
+        public async Task<IActionResult> Restore([FromBody]PostViewModel entity)
         {
-            _postService.Restore(entity);
+            await _postService.Restore(entity);
 
             return Response();
         }

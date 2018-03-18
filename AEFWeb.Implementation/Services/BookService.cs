@@ -10,7 +10,7 @@ using AutoMapper;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.Linq;
+using System.Threading.Tasks;
 
 namespace AEFWeb.Implementation.Services
 {
@@ -22,55 +22,55 @@ namespace AEFWeb.Implementation.Services
                             IMediatorHandler bus, 
                             IUnitOfWork unitOfWork) : base(bus, unitOfWork) => _mapper = mapper;
 
-        public BookViewModel Get(Guid id) => 
-            _mapper.Map<BookViewModel>(_repository.Get(id));
+        public async Task<BookViewModel> Get(Guid id) => 
+            _mapper.Map<BookViewModel>(await _repository.Get(id));
 
-        public IEnumerable<BookViewModel> GetAll() => 
-            _mapper.Map<IEnumerable<BookViewModel>>(_repository.GetAll());
+        public async Task<IEnumerable<BookViewModel>> GetAll() => 
+            _mapper.Map<IEnumerable<BookViewModel>>(await _repository.GetAll());
 
-        public void Add(BookViewModel viewModel)
+        public async Task Add(BookViewModel viewModel)
         {
             viewModel.Id = Guid.NewGuid();
             var book = _mapper.Map<Book>(viewModel);
-            _repository.Add(book);
+            await _repository.Add(book);
 
-            if (Commit())
-                RegisterLog(new EventLog(Guid.NewGuid(), viewModel.CreationDate, viewModel.CreatorUserId, null, null, JsonConvert.SerializeObject(viewModel), Type, "Add"));
+            if (await Commit())
+                await RegisterLog(new EventLog(Guid.NewGuid(), viewModel.CreationDate, viewModel.CreatorUserId, null, null, JsonConvert.SerializeObject(viewModel), Type, "Add"));
         }
         
-        public void Update(BookViewModel viewModel)
+        public async Task Update(BookViewModel viewModel)
         {
-            var book = _repository.Get(viewModel.Id);
+            var book = await _repository.Get(viewModel.Id);
 
             if (book != null)
             {
                 _mapper.Map(viewModel, book);
 
-                if (Commit())
-                    RegisterLog(new EventLog(Guid.NewGuid(), null, null, viewModel.LastUpdateDate, viewModel.LastUpdatedUserId, JsonConvert.SerializeObject(viewModel), Type, "Update"));
+                if (await Commit())
+                    await RegisterLog(new EventLog(Guid.NewGuid(), null, null, viewModel.LastUpdateDate, viewModel.LastUpdatedUserId, JsonConvert.SerializeObject(viewModel), Type, "Update"));
             }
             else
             {
-                _bus.RaiseEvent(new Notification("defaultError", "Título não encontrado"));
+                await _bus.RaiseEvent(new Notification("defaultError", "Título não encontrado"));
             }
         }
 
-        public void Remove(BookViewModel viewModel)
+        public async Task Remove(BookViewModel viewModel)
         {
-            var book = _repository.Get(viewModel.Id);
+            var book = await _repository.Get(viewModel.Id);
             book.SetDeleted(true);
 
-            if (Commit())
-                RegisterLog(new EventLog(Guid.NewGuid(), null, null, viewModel.LastUpdateDate, viewModel.LastUpdatedUserId, JsonConvert.SerializeObject(viewModel), Type, "Remove"));
+            if (await Commit())
+                await RegisterLog(new EventLog(Guid.NewGuid(), null, null, viewModel.LastUpdateDate, viewModel.LastUpdatedUserId, JsonConvert.SerializeObject(viewModel), Type, "Remove"));
         }
 
-        public void Restore(BookViewModel viewModel)
+        public async Task Restore(BookViewModel viewModel)
         {
-            var book = _repository.Get(viewModel.Id);
+            var book = await _repository.Get(viewModel.Id);
             book.SetDeleted(false);
 
-            if (Commit())
-                RegisterLog(new EventLog(Guid.NewGuid(), null, null, viewModel.LastUpdateDate, viewModel.LastUpdatedUserId, JsonConvert.SerializeObject(viewModel), Type, "Restore"));
+            if (await Commit())
+                await RegisterLog(new EventLog(Guid.NewGuid(), null, null, viewModel.LastUpdateDate, viewModel.LastUpdatedUserId, JsonConvert.SerializeObject(viewModel), Type, "Restore"));
         }
     }
 }

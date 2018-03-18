@@ -34,61 +34,61 @@ namespace AEFWeb.Implementation.Services
             _urlSettings = urlSettings.Value;
         }
 
-        public UserViewModel Get(Guid id) =>
-            _mapper.Map<UserViewModel>(_repository.Get(id));
+        public async Task<UserViewModel> Get(Guid id) =>
+            _mapper.Map<UserViewModel>(await _repository.Get(id));
 
-        public IEnumerable<UserViewModel> GetAll() =>
-            _mapper.Map<IEnumerable<UserViewModel>>(_repository.GetAll());
+        public async Task<IEnumerable<UserViewModel>> GetAll() =>
+            _mapper.Map<IEnumerable<UserViewModel>>(await _repository.GetAll());
 
-        public UserUpdatePasswordViewModel GetByEmail(string email) =>
-            _mapper.Map<UserUpdatePasswordViewModel>(_repository.GetByCriteria(x => x.Email.ToLower() == email.ToLower()));
+        public async Task<UserUpdatePasswordViewModel> GetByEmail(string email) =>
+            _mapper.Map<UserUpdatePasswordViewModel>(await _repository.GetByCriteria(x => x.Email.ToLower() == email.ToLower()));
 
-        public void Add(UserViewModel viewModel)
+        public async Task Add(UserViewModel viewModel)
         {
             viewModel.Id = Guid.NewGuid();
 
-            if (_repository.GetByCriteria(x => x.Email.ToLower() == viewModel.Email.ToLower()) != null)
+            if (await _repository.GetByCriteria(x => x.Email.ToLower() == viewModel.Email.ToLower()) != null)
             {
-                _bus.RaiseEvent(new Notification("Email", "Este e-mail já está sendo usado"));
+                await _bus.RaiseEvent(new Notification("Email", "Este e-mail já está sendo usado"));
                 return;
             }
 
             var user = _mapper.Map<User>(viewModel);
-            _repository.Add(user);
+            await _repository.Add(user);
 
-            if (Commit())
+            if (await Commit())
             {
-                RegisterLog(new EventLog(Guid.NewGuid(), viewModel.CreationDate, viewModel.CreatorUserId, null, null, JsonConvert.SerializeObject(user), Type, "Add"));
+                await RegisterLog(new EventLog(Guid.NewGuid(), viewModel.CreationDate, viewModel.CreatorUserId, null, null, JsonConvert.SerializeObject(user), Type, "Add"));
 
-                _emailService.SendEmailAsync(viewModel.Email, "Cadastro AEF", BuildActiveMessage(viewModel));
+                await _emailService.SendEmailAsync(viewModel.Email, "Cadastro AEF", BuildActiveMessage(viewModel));
             }
         }
 
-        public void Update(UserViewModel viewModel)
+        public async Task Update(UserViewModel viewModel)
         {
-            var user = _repository.Get(viewModel.Id);
+            var user = await _repository.Get(viewModel.Id);
 
             if (user != null)
             {
                 if (user.Email != viewModel.Email)
                 {
-                    _bus.RaiseEvent(new Notification("Email", "Não é possível alterar e-mail."));
+                    await _bus.RaiseEvent(new Notification("Email", "Não é possível alterar e-mail."));
                     return;
                 }
 
                 _mapper.Map(viewModel, user);
-                if (Commit())
-                    RegisterLog(new EventLog(Guid.NewGuid(), null, null, viewModel.LastUpdateDate, viewModel.LastUpdatedUserId, JsonConvert.SerializeObject(user), Type, "Update"));
+                if (await Commit())
+                    await RegisterLog(new EventLog(Guid.NewGuid(), null, null, viewModel.LastUpdateDate, viewModel.LastUpdatedUserId, JsonConvert.SerializeObject(user), Type, "Update"));
             }
             else
             {
-                _bus.RaiseEvent(new Notification("defaultError", "Usuário não encontrado"));
+                await _bus.RaiseEvent(new Notification("defaultError", "Usuário não encontrado"));
             }
         }
 
-        public UserViewModel UpdatePassword(UserUpdatePasswordViewModel viewModel)
+        public async Task<UserViewModel> UpdatePassword(UserUpdatePasswordViewModel viewModel)
         {
-            var user = _repository.Get(viewModel.Id);
+            var user = await _repository.Get(viewModel.Id);
             
             if(user != null)
             {
@@ -96,38 +96,38 @@ namespace AEFWeb.Implementation.Services
                 {
                     user.SetPassword(Utils.Utils.EncryptPassword(viewModel.Password));
                     user.SetPasswordChangeToken(null);
-                    Commit();
+                    await Commit();
                     return _mapper.Map<UserViewModel>(user);
                 }
                 else
                 {
-                    _bus.RaiseEvent(new Notification("defaultError", "Sua conta já esta ativa, faça o login."));
+                    await _bus.RaiseEvent(new Notification("defaultError", "Sua conta já esta ativa, faça o login."));
                     return null;
                 }
             }
             else
             {
-                _bus.RaiseEvent(new Notification("defaultError", "Usuário não encontrato."));
+                await _bus.RaiseEvent(new Notification("defaultError", "Usuário não encontrato."));
                 return null;
             }
         }
 
-        public void Remove(UserViewModel viewModel)
+        public async Task Remove(UserViewModel viewModel)
         {
-            var user = _repository.Get(viewModel.Id);
+            var user = await _repository.Get(viewModel.Id);
             user.SetDeleted(true); 
 
-            if (Commit())
-                RegisterLog(new EventLog(Guid.NewGuid(), null, null, viewModel.LastUpdateDate, viewModel.LastUpdatedUserId, JsonConvert.SerializeObject(viewModel), Type, "Remove"));
+            if (await Commit())
+                await RegisterLog(new EventLog(Guid.NewGuid(), null, null, viewModel.LastUpdateDate, viewModel.LastUpdatedUserId, JsonConvert.SerializeObject(viewModel), Type, "Remove"));
         }
 
-        public void Restore(UserViewModel viewModel)
+        public async Task Restore(UserViewModel viewModel)
         {
-            var user = _repository.Get(viewModel.Id);
+            var user = await _repository.Get(viewModel.Id);
             user.SetDeleted(false);
 
-            if (Commit())
-                RegisterLog(new EventLog(Guid.NewGuid(), null, null, viewModel.LastUpdateDate, viewModel.LastUpdatedUserId, JsonConvert.SerializeObject(viewModel), Type, "Restore"));
+            if (await Commit())
+                await RegisterLog(new EventLog(Guid.NewGuid(), null, null, viewModel.LastUpdateDate, viewModel.LastUpdatedUserId, JsonConvert.SerializeObject(viewModel), Type, "Restore"));
         }
 
         public bool IsVerifyPassword(string passwordLogin, string passwordUser) =>
@@ -135,16 +135,16 @@ namespace AEFWeb.Implementation.Services
 
         public async Task SendRecoverPassword(Guid id)
         {
-            var user = _repository.GetByCriteria(x => x.Id == id);
+            var user = await _repository.GetByCriteria(x => x.Id == id);
             user.SetPasswordChangeToken(Guid.NewGuid());
 
-            if (Commit())
+            if (await Commit())
                 await _emailService.SendEmailAsync(user.Email, "Recuperação de senha AEF", BuildRecoverPasswordMessage(user));
         }
 
         public async Task<UserViewModel> GetByPasswordToken(Guid token, string email)
         {
-            return _mapper.Map<UserViewModel>(_repository.GetByCriteria(x => x.Email == email && x.PasswordChangeToken == token));
+            return _mapper.Map<UserViewModel>(await _repository.GetByCriteria(x => x.Email == email && x.PasswordChangeToken == token));
         }
 
         private string BuildActiveMessage(UserViewModel viewModel)

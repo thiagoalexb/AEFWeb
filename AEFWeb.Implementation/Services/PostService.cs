@@ -11,6 +11,7 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Transactions;
 
 namespace AEFWeb.Implementation.Services
@@ -29,88 +30,147 @@ namespace AEFWeb.Implementation.Services
             _postTagRepository = unitOfWork.Repository<IPostTagRepository>();
         }
 
-        public PostViewModel Get(Guid id) =>
-            _mapper.Map<PostViewModel>(_repository.Get(id));
+        public async Task<PostViewModel> Get(Guid id)
+        {
+            var postdb = await _repository.Get(id);
+            var post = _mapper.Map<PostViewModel>(postdb);
+            if (post != null)
+            {
+                var tags = _mapper.Map<IEnumerable<TagViewModel>>(postdb.PostTags.Select(x => x.Tag));
+                post.Tags.AddRange(tags);
+            }
 
-        public IEnumerable<PostViewModel> GetAll() =>
-            _mapper.Map<IEnumerable<PostViewModel>>(_repository.GetAll());
+            return post;
+        }
+        public async Task<IEnumerable<PostViewModel>> GetAll()
+        {
 
-        public void Add(PostViewModel viewModel)
+            var list = new List<PostViewModel>();
+            foreach (var item in await _repository.GetAll())
+            {
+                var post = _mapper.Map<PostViewModel>(item);
+                if (post != null)
+                {
+                    var tags = _mapper.Map<IEnumerable<TagViewModel>>(item.PostTags.Select(x => x.Tag));
+                    post.Tags.AddRange(tags);
+                }
+                list.Add(post);
+            }
+            return list;
+        }
+
+
+        public async Task Add(PostViewModel viewModel)
         {
             viewModel.Id = Guid.NewGuid();
 
             var _post = _mapper.Map<Post>(viewModel);
 
-            _postTagRepository.AddRange(viewModel.Tags.Select(x => new PostTag()
+            foreach (var tag in GetNewTags(viewModel.Tags))
             {
-                Post = _post,
-                TagId = x.Id
-            }));
+                await _postTagRepository.Add(new PostTag()
+                {
+                    Post = _post,
+                    Tag = tag
+                });
+            }
 
-            if (Commit())
-                RegisterLog(new EventLog(Guid.NewGuid(), viewModel.CreationDate, viewModel.CreatorUserId, null, null, JsonConvert.SerializeObject(viewModel), Type, "Add"));
+            foreach (var id in GetExistingTags(viewModel.Tags))
+            {
+                await _postTagRepository.Add(new PostTag()
+                {
+                    Post = _post,
+                    TagId = id
+                });
+            }
+
+            if (await Commit())
+                await RegisterLog(new EventLog(Guid.NewGuid(), viewModel.CreationDate, viewModel.CreatorUserId, null, null, JsonConvert.SerializeObject(viewModel), Type, "Add"));
         }
 
-        public void Update(PostViewModel viewModel)
+        public async Task Update(PostViewModel viewModel)
         {
-            var post = _repository.Get(viewModel.Id);
+            var _post = await _repository.Get(viewModel.Id);
 
-            if (post != null)
+            if (_post != null)
             {
                 _unitOfWork.BeginTransaction();
-                _postTagRepository.RemoveRange(post.PostTags);
-                if (Commit())
+                _postTagRepository.RemoveRange(_post.PostTags);
+                if (await Commit())
                 {
-                    post = _mapper.Map(viewModel, post);
-                    if (Commit())
+                    _post = _mapper.Map(viewModel, _post);
+
+                    foreach (var tag in GetNewTags(viewModel.Tags))
                     {
-                        _postTagRepository.AddRange(viewModel.Tags.Select(x => new PostTag()
+                        await _postTagRepository.Add(new PostTag()
                         {
-                            Post = post,
-                            TagId = x.Id
-                        }));
-
-                        if (Commit())
-                            RegisterLog(new EventLog(Guid.NewGuid(), null, null, viewModel.LastUpdateDate, viewModel.LastUpdatedUserId, JsonConvert.SerializeObject(viewModel), Type, "Update"));
-
-                        _unitOfWork.CommitTransaction();
-                        _unitOfWork.EndTransaction();
+                            Post = _post,
+                            Tag = tag
+                        });
                     }
-                    else
+
+                    foreach (var id in GetExistingTags(viewModel.Tags))
                     {
-                        _unitOfWork.EndTransaction();
-                        _bus.RaiseEvent(new Notification("defaultError", "Erro inesperado, tente novamente!"));
+                        await _postTagRepository.Add(new PostTag()
+                        {
+                            Post = _post,
+                            TagId = id
+                        });
                     }
+
+                    if (await Commit())
+                        await RegisterLog(new EventLog(Guid.NewGuid(), null, null, viewModel.LastUpdateDate, viewModel.LastUpdatedUserId, JsonConvert.SerializeObject(viewModel), Type, "Update"));
+
+                    _unitOfWork.CommitTransaction();
+                    _unitOfWork.EndTransaction();
                 }
                 else
                 {
                     _unitOfWork.EndTransaction();
-                    _bus.RaiseEvent(new Notification("defaultError", "Erro inesperado, tente novamente!"));
+                    await _bus.RaiseEvent(new Notification("defaultError", "Erro inesperado, tente novamente!"));
                 }
             }
             else
             {
-                _bus.RaiseEvent(new Notification("defaultError", "Post não encontrado"));
+                await _bus.RaiseEvent(new Notification("defaultError", "Post não encontrado"));
             }
 
         }
 
-        public void Remove(PostViewModel viewModel)
+        public async Task Remove(PostViewModel viewModel)
         {
-            var post = _repository.Get(viewModel.Id);
+            var post = await _repository.Get(viewModel.Id);
             post.SetDeleted(true);
 
-            if (Commit())
-                RegisterLog(new EventLog(Guid.NewGuid(), null, null, viewModel.LastUpdateDate, viewModel.LastUpdatedUserId, JsonConvert.SerializeObject(viewModel), Type, "Remove"));
+            if (await Commit())
+                await RegisterLog(new EventLog(Guid.NewGuid(), null, null, viewModel.LastUpdateDate, viewModel.LastUpdatedUserId, JsonConvert.SerializeObject(viewModel), Type, "Remove"));
         }
 
-        public void Restore(PostViewModel viewModel)
+        public async Task Restore(PostViewModel viewModel)
         {
-            var post = _repository.Get(viewModel.Id);
+            var post = await _repository.Get(viewModel.Id);
             post.SetDeleted(false);
 
-            if (Commit())
-                RegisterLog(new EventLog(Guid.NewGuid(), null, null, viewModel.LastUpdateDate, viewModel.LastUpdatedUserId, JsonConvert.SerializeObject(viewModel), Type, "Restore"));
+            if (await Commit())
+                await RegisterLog(new EventLog(Guid.NewGuid(), null, null, viewModel.LastUpdateDate, viewModel.LastUpdatedUserId, JsonConvert.SerializeObject(viewModel), Type, "Restore"));
+        }
+
+        private IEnumerable<Tag> GetNewTags(List<TagViewModel> list)
+        {
+            var news = list.Where(x => x.Id == Guid.Empty);
+            foreach (var item in news)
+            {
+                yield return new Tag(Guid.Empty, item.Name);
+            }
+        }
+
+        private IEnumerable<Guid> GetExistingTags(List<TagViewModel> list)
+        {
+            var news = list.Where(x => x.Id != Guid.Empty);
+            foreach (var item in news)
+            {
+                yield return item.Id;
+            }
         }
     }
 }

@@ -6,6 +6,7 @@ using System.Linq;
 using System.Collections.Generic;
 using AEFWeb.Core.Repositories;
 using System.Linq.Expressions;
+using System.Threading.Tasks;
 
 namespace AEFWeb.Implementation.Repositories
 {
@@ -14,28 +15,28 @@ namespace AEFWeb.Implementation.Repositories
         public PostRepository(DbContext context) : base(context)
         { }
 
-        public override IEnumerable<Post> GetAll() =>
-            DbSet.Include(x => x.User)
+        public override async Task<IEnumerable<Post>> GetAll() =>
+            await DbSet.Include(x => x.User)
                                 .Include(x => x.PostTags)
                                     .ThenInclude(x => x.Tag)
-                                    .ToList();
+                                    .ToListAsync();
 
-        public override Post Get(Guid id) =>
-            DbSet.Include(x => x.User)
+        public override async Task<Post> Get(Guid id) =>
+            await DbSet.Include(x => x.User)
                                 .Include(x => x.PostTags)
                                     .ThenInclude(x => x.Tag)
-                                    .FirstOrDefault(x => x.Id == id);
+                                    .FirstOrDefaultAsync(x => x.Id == id);
 
-        public override IEnumerable<Post> Find(Expression<Func<Post, bool>> predicate) =>
-           DbSet.Include(x => x.User)
+        public override async Task<IEnumerable<Post>> Find(Expression<Func<Post, bool>> predicate) =>
+           await DbSet.Include(x => x.User)
                                 .Include(x => x.PostTags)
                                     .ThenInclude(x => x.Tag)
-                                    .Where(predicate);
+                                    .Where(predicate).ToListAsync();
 
-        public override Post GetByCriteria(Expression<Func<Post, bool>> predicate) =>
-            DbSet.Include(x => x.User)
+        public override async Task<Post> GetByCriteria(Expression<Func<Post, bool>> predicate) =>
+            await DbSet.Include(x => x.User)
                                     .Include(x => x.PostTags)
                                         .ThenInclude(x => x.Tag)
-                                        .FirstOrDefault(predicate);
+                                        .FirstOrDefaultAsync(predicate);
     }
 }

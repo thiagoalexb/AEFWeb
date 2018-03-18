@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Threading.Tasks;
 
 namespace AEFWeb.Implementation.Repositories.Core
 {
@@ -18,28 +19,22 @@ namespace AEFWeb.Implementation.Repositories.Core
             DbSet = Context.Set<TEntity>();
         }
 
-        public virtual TEntity Get(Guid id) =>
-            DbSet.Find(id);
+        public virtual async Task<TEntity> Get(Guid id) =>
+            await DbSet.FindAsync(id);
 
-        public virtual IEnumerable<TEntity> GetAll() =>
-            DbSet.ToList();
+        public virtual async Task<IEnumerable<TEntity>> GetAll() =>
+            await DbSet.ToListAsync();
 
-        public virtual IEnumerable<TEntity> Find(Expression<Func<TEntity, bool>> predicate) =>
-            DbSet.Where(predicate);
+        public virtual async Task<IEnumerable<TEntity>> Find(Expression<Func<TEntity, bool>> predicate) =>
+            await DbSet.Where(predicate).ToListAsync();
 
-        public virtual TEntity GetByCriteria(Expression<Func<TEntity, bool>> predicate) =>
-            DbSet.FirstOrDefault(predicate);
+        public virtual async Task<TEntity> GetByCriteria(Expression<Func<TEntity, bool>> predicate) =>
+            await DbSet.FirstOrDefaultAsync(predicate);
 
-        public virtual void Add(TEntity entity) =>
-            DbSet.Add(entity);
+        public virtual async Task Add(TEntity entity) =>
+            await DbSet.AddAsync(entity);
 
-        public virtual void AddRange(IEnumerable<TEntity> entities) =>
-            DbSet.AddRange(entities);
-
-        public virtual void Remove(TEntity entity) =>
-            DbSet.Remove(entity);
-
-        public virtual void RemoveRange(IEnumerable<TEntity> entities) =>
-            DbSet.RemoveRange(entities);
+        public virtual async Task AddRange(IEnumerable<TEntity> entities) =>
+            await DbSet.AddRangeAsync(entities);
     }
 }
