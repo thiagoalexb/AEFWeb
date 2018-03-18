@@ -8,13 +8,13 @@ namespace AEFWeb.Core.AutoMapper
     {
         public ViewModelToDomainMappingProfile()
         {
-            CreateMap<UserViewModel, User>();
-            CreateMap<TagViewModel, Tag>();
-            CreateMap<PostViewModel, Post>();
+            CreateMap<UserViewModel, User>().ForMember(x => x.Id, opt => opt.Ignore());
+            CreateMap<TagViewModel, Tag>().ForMember(x => x.Id, opt => opt.Ignore());
+            CreateMap<PostViewModel, Post>().ForMember(x => x.Id, opt => opt.Ignore());
             CreateMap<PostTagViewModel, PostTag>();
-            CreateMap<BookViewModel, Book>();
-            CreateMap<EventViewModel, Event>();
-            CreateMap<LessonViewModel, Lesson>();
+            CreateMap<BookViewModel, Book>().ForMember(x => x.Id, opt => opt.Ignore());
+            CreateMap<EventViewModel, Event>().ForMember(x => x.Id, opt => opt.Ignore());
+            CreateMap<LessonViewModel, Lesson>().ForMember(x => x.Id, opt => opt.Ignore());
         }
     }
 }

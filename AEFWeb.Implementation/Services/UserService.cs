@@ -45,20 +45,28 @@ namespace AEFWeb.Implementation.Services
 
         public async Task Add(UserViewModel viewModel)
         {
-            viewModel.Id = Guid.NewGuid();
-
-            if (await _repository.GetByCriteria(x => x.Email.ToLower() == viewModel.Email.ToLower()) != null)
+            var userdb = await _repository.GetByCriteria(x => x.Email.ToLower() == viewModel.Email.ToLower());
+            if(userdb != null && userdb.Deleted == false)
             {
                 await _bus.RaiseEvent(new Notification("Email", "Este e-mail já está sendo usado"));
                 return;
             }
-
-            var user = _mapper.Map<User>(viewModel);
-            await _repository.Add(user);
+            else if(userdb != null)
+            {
+                _mapper.Map(viewModel, userdb);
+                viewModel.Id = userdb.Id;
+            }
+            else
+            {
+                viewModel.Id = Guid.NewGuid();
+                var user = _mapper.Map<User>(viewModel);
+                await _repository.Add(user);
+            }
+            
 
             if (await Commit())
             {
-                await RegisterLog(new EventLog(Guid.NewGuid(), viewModel.CreationDate, viewModel.CreatorUserId, null, null, JsonConvert.SerializeObject(user), Type, "Add"));
+                await RegisterLog(new EventLog(Guid.NewGuid(), viewModel.CreationDate, viewModel.CreatorUserId, null, null, JsonConvert.SerializeObject(viewModel), Type, "Add"));
 
                 await _emailService.SendEmailAsync(viewModel.Email, "Cadastro AEF", BuildActiveMessage(viewModel));
             }

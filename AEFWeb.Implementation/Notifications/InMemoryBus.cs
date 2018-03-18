@@ -17,18 +17,13 @@ namespace AEFWeb.Implementation.Notifications
             _eventLogService = eventLogService;
         }
 
-        public Task RaiseEvent<T>(T @event) where T : INotification
-        {          
-            return Publish(@event);
-        }
+        public async Task RaiseEvent<T>(T @event) where T : INotification =>
+             await Publish(@event);
 
-        public Task RaiseEventLog<T>(T @event) where T : EventLog
-        {
-            _eventLogService.Add(@event);
-            return Task.FromResult("Log");
-        }
+        public async Task RaiseEventLog<T>(T @event) where T : EventLog =>
+            await _eventLogService.Add(@event);
 
-        private Task Publish<T>(T message) where T : INotification =>
-            _mediator.Publish(message);
+        private async Task Publish<T>(T message) where T : INotification =>
+            await _mediator.Publish(message);
     }
 }
