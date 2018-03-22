@@ -7,10 +7,11 @@ namespace AEFWeb.Core.Services
 {
     public interface IUserService : IService<UserViewModel>
     {
-        Task<UserViewModel> UpdatePassword(UserUpdatePasswordViewModel viewModel);
+        Task<UserViewModel> UpdatePasswordAsync(UserUpdatePasswordViewModel viewModel);
         bool IsVerifyPassword(string passwordLogin, string passwordUser);
-        Task<UserUpdatePasswordViewModel> GetByEmail(string email);
-        Task SendRecoverPassword(Guid id);
-        Task<UserViewModel> GetByPasswordToken(Guid token, string email);
+        Task<UserUpdatePasswordViewModel> GetByEmailAsync(string email);
+        Task SendRecoverPasswordAsync(Guid id);
+        Task<UserViewModel> GetByPasswordTokenAsync(Guid token, string email);
+        Task<object> VerifyPasswordToken(Guid token, string email);
     }
 }

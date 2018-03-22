@@ -1,4 +1,5 @@
-﻿using System;
+﻿using AEFWeb.Core.ViewModels.Core;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -6,12 +7,13 @@ namespace AEFWeb.Core.Services.Core
 {
     public interface IService<TViewModel> where TViewModel : class
     {
-        Task<TViewModel> Get(Guid id);
-        Task<IEnumerable<TViewModel>> GetAll();
+        Task<TViewModel> GetAsync(Guid id);
+        Task<IEnumerable<TViewModel>> GetAllAsync();
+        Task<PaginateResultBase<TViewModel>> GetPaginateAsync(PaginateFilterBase filter);
 
-        Task Add(TViewModel viewModel);
-        Task Update(TViewModel viewModel);
-        Task Remove(TViewModel viewModel);
-        Task Restore(TViewModel viewModel);
+        Task AddAsync(TViewModel viewModel);
+        Task UpdateAsync(TViewModel viewModel);
+        Task RemoveAsync(TViewModel viewModel);
+        Task RestoreAsync(TViewModel viewModel);
     }
 }

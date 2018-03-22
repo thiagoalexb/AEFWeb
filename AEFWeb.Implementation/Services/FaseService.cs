@@ -17,37 +17,33 @@ using System.Linq;
 
 namespace AEFWeb.Implementation.Services
 {
-    public class BookService : Service<IBookRepository>, IBookService
+    public class FaseService : Service<IFaseRepository>, IFaseService
     {
         private readonly IMapper _mapper;
 
-        public BookService(IMapper mapper,
+        public FaseService(IMapper mapper,
                             IMediatorHandler bus, 
                             IUnitOfWork unitOfWork) : base(bus, unitOfWork) => _mapper = mapper;
 
-        public async Task<BookViewModel> GetAsync(Guid id) => 
-            _mapper.Map<BookViewModel>(await _repository.GetAsync(id));
+        public async Task<FaseViewModel> GetAsync(Guid id) => 
+            _mapper.Map<FaseViewModel>(await _repository.GetAsync(id));
 
-        public async Task<IEnumerable<BookViewModel>> GetAllAsync() => 
-            _mapper.Map<IEnumerable<BookViewModel>>(await _repository.GetAllAsync());
+        public async Task<IEnumerable<FaseViewModel>> GetAllAsync() => 
+            _mapper.Map<IEnumerable<FaseViewModel>>(await _repository.GetAllAsync());
 
-        public async Task<PaginateResultBase<BookViewModel>> GetPaginateAsync(PaginateFilterBase filter)
+        public async Task<PaginateResultBase<FaseViewModel>> GetPaginateAsync(PaginateFilterBase filter)
         {
             var query = await _repository.GetQueryableByCriteria(x => !x.Deleted);
 
             if (!string.IsNullOrEmpty(filter.Search))
             {
                 filter.Search = filter.Search.ToLower();
-                query = query.Where(x => x.Author.ToLower().Contains(filter.Search) 
-                                        || x.Edition.ToLower().Contains(filter.Search)
-                                        || x.PublishingCompany.ToLower().Contains(filter.Search)
-                                        || x.Title.ToLower().Contains(filter.Search)
-                                        || x.Value.ToString().Contains(filter.Search));
+                query = query.Where(x => x.Name.ToLower().Contains(filter.Search));
             }
 
             var total = query.Count();
 
-            query = query.OrderByDescending(x => x.Title);
+            query = query.OrderByDescending(x => x.Name);
 
             if (int.TryParse(filter.Skip, out int skip))
                 query = query.Skip(skip);
@@ -55,28 +51,28 @@ namespace AEFWeb.Implementation.Services
             if (int.TryParse(filter.Take, out int take))
                 query = query.Take(take);
 
-            var list = _mapper.Map<List<BookViewModel>>(query.ToList());
+            var list = _mapper.Map<List<FaseViewModel>>(query.ToList());
 
-            return new PaginateResultBase<BookViewModel>() { Results = list, Total = total };
+            return new PaginateResultBase<FaseViewModel>() { Results = list, Total = total };
         }
 
-        public async Task AddAsync(BookViewModel viewModel)
+        public async Task AddAsync(FaseViewModel viewModel)
         {
             viewModel.Id = Guid.NewGuid();
-            var book = _mapper.Map<Book>(viewModel);
-            await _repository.AddAsync(book);
+            var fase = _mapper.Map<Fase>(viewModel);
+            await _repository.AddAsync(fase);
 
             if (await Commit())
                 await RegisterLog(new EventLog(Guid.NewGuid(), viewModel.CreationDate, viewModel.CreatorUserId, null, null, JsonConvert.SerializeObject(viewModel), Type, "Add"));
         }
         
-        public async Task UpdateAsync(BookViewModel viewModel)
+        public async Task UpdateAsync(FaseViewModel viewModel)
         {
-            var book = await _repository.GetAsync(viewModel.Id);
+            var fase = await _repository.GetAsync(viewModel.Id);
 
-            if (book != null)
+            if (fase != null)
             {
-                _mapper.Map(viewModel, book);
+                _mapper.Map(viewModel, fase);
 
                 if (await Commit())
                     await RegisterLog(new EventLog(Guid.NewGuid(), null, null, viewModel.LastUpdateDate, viewModel.LastUpdatedUserId, JsonConvert.SerializeObject(viewModel), Type, "Update"));
@@ -87,19 +83,19 @@ namespace AEFWeb.Implementation.Services
             }
         }
 
-        public async Task RemoveAsync(BookViewModel viewModel)
+        public async Task RemoveAsync(FaseViewModel viewModel)
         {
-            var book = await _repository.GetAsync(viewModel.Id);
-            book.SetDeleted(true);
+            var fase = await _repository.GetAsync(viewModel.Id);
+            fase.SetDeleted(true);
 
             if (await Commit())
                 await RegisterLog(new EventLog(Guid.NewGuid(), null, null, viewModel.LastUpdateDate, viewModel.LastUpdatedUserId, JsonConvert.SerializeObject(viewModel), Type, "Remove"));
         }
 
-        public async Task RestoreAsync(BookViewModel viewModel)
+        public async Task RestoreAsync(FaseViewModel viewModel)
         {
-            var book = await _repository.GetAsync(viewModel.Id);
-            book.SetDeleted(false);
+            var fase = await _repository.GetAsync(viewModel.Id);
+            fase.SetDeleted(false);
 
             if (await Commit())
                 await RegisterLog(new EventLog(Guid.NewGuid(), null, null, viewModel.LastUpdateDate, viewModel.LastUpdatedUserId, JsonConvert.SerializeObject(viewModel), Type, "Restore"));

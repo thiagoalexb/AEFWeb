@@ -3,6 +3,7 @@ using AEFWeb.Core.Repositories;
 using AEFWeb.Core.Services;
 using AEFWeb.Core.UnitOfWork;
 using AEFWeb.Core.ViewModels;
+using AEFWeb.Core.ViewModels.Core;
 using AEFWeb.Data.Entities;
 using AEFWeb.Implementation.Notifications;
 using AEFWeb.Implementation.Services.Core;
@@ -30,9 +31,9 @@ namespace AEFWeb.Implementation.Services
             _postTagRepository = unitOfWork.Repository<IPostTagRepository>();
         }
 
-        public async Task<PostViewModel> Get(Guid id)
+        public async Task<PostViewModel> GetAsync(Guid id)
         {
-            var postdb = await _repository.Get(id);
+            var postdb = await _repository.GetAsync(id);
             var post = _mapper.Map<PostViewModel>(postdb);
             if (post != null)
             {
@@ -42,11 +43,12 @@ namespace AEFWeb.Implementation.Services
 
             return post;
         }
-        public async Task<IEnumerable<PostViewModel>> GetAll()
+
+        public async Task<IEnumerable<PostViewModel>> GetAllAsync()
         {
 
             var list = new List<PostViewModel>();
-            foreach (var item in await _repository.GetAll())
+            foreach (var item in await _repository.GetAllAsync())
             {
                 var post = _mapper.Map<PostViewModel>(item);
                 if (post != null)
@@ -59,8 +61,35 @@ namespace AEFWeb.Implementation.Services
             return list;
         }
 
+        public async Task<PaginateResultBase<PostViewModel>> GetPaginateAsync(PaginateFilterBase filter)
+        {
+            var query = await _repository.GetQueryableByCriteria(x => !x.Deleted);
 
-        public async Task Add(PostViewModel viewModel)
+            if (!string.IsNullOrEmpty(filter.Search))
+            {
+                filter.Search = filter.Search.ToLower();
+                query = query.Where(x => x.Title.ToLower().Contains(filter.Search)
+                                        || x.SubTitle.ToLower().Contains(filter.Search)
+                                        || x.User.FirstName.ToLower().Contains(filter.Search)
+                                        || x.User.LastName.ToLower().Contains(filter.Search));
+            }
+
+            var total = query.Count();
+
+            query = query.OrderByDescending(x => x.Title);
+
+            if (int.TryParse(filter.Skip, out int skip))
+                query = query.Skip(skip);
+
+            if (int.TryParse(filter.Take, out int take))
+                query = query.Take(take);
+
+            var list = _mapper.Map<List<PostViewModel>>(query.ToList());
+
+            return new PaginateResultBase<PostViewModel>() { Results = list, Total = total };
+        }
+
+        public async Task AddAsync(PostViewModel viewModel)
         {
             viewModel.Id = Guid.NewGuid();
 
@@ -68,7 +97,7 @@ namespace AEFWeb.Implementation.Services
 
             foreach (var tag in GetNewTags(viewModel.Tags))
             {
-                await _postTagRepository.Add(new PostTag()
+                await _postTagRepository.AddAsync(new PostTag()
                 {
                     Post = _post,
                     Tag = tag
@@ -77,7 +106,7 @@ namespace AEFWeb.Implementation.Services
 
             foreach (var id in GetExistingTags(viewModel.Tags))
             {
-                await _postTagRepository.Add(new PostTag()
+                await _postTagRepository.AddAsync(new PostTag()
                 {
                     Post = _post,
                     TagId = id
@@ -88,9 +117,9 @@ namespace AEFWeb.Implementation.Services
                 await RegisterLog(new EventLog(Guid.NewGuid(), viewModel.CreationDate, viewModel.CreatorUserId, null, null, JsonConvert.SerializeObject(viewModel), Type, "Add"));
         }
 
-        public async Task Update(PostViewModel viewModel)
+        public async Task UpdateAsync(PostViewModel viewModel)
         {
-            var _post = await _repository.Get(viewModel.Id);
+            var _post = await _repository.GetAsync(viewModel.Id);
 
             if (_post != null)
             {
@@ -102,7 +131,7 @@ namespace AEFWeb.Implementation.Services
 
                     foreach (var tag in GetNewTags(viewModel.Tags))
                     {
-                        await _postTagRepository.Add(new PostTag()
+                        await _postTagRepository.AddAsync(new PostTag()
                         {
                             Post = _post,
                             Tag = tag
@@ -111,7 +140,7 @@ namespace AEFWeb.Implementation.Services
 
                     foreach (var id in GetExistingTags(viewModel.Tags))
                     {
-                        await _postTagRepository.Add(new PostTag()
+                        await _postTagRepository.AddAsync(new PostTag()
                         {
                             Post = _post,
                             TagId = id
@@ -137,18 +166,18 @@ namespace AEFWeb.Implementation.Services
 
         }
 
-        public async Task Remove(PostViewModel viewModel)
+        public async Task RemoveAsync(PostViewModel viewModel)
         {
-            var post = await _repository.Get(viewModel.Id);
+            var post = await _repository.GetAsync(viewModel.Id);
             post.SetDeleted(true);
 
             if (await Commit())
                 await RegisterLog(new EventLog(Guid.NewGuid(), null, null, viewModel.LastUpdateDate, viewModel.LastUpdatedUserId, JsonConvert.SerializeObject(viewModel), Type, "Remove"));
         }
 
-        public async Task Restore(PostViewModel viewModel)
+        public async Task RestoreAsync(PostViewModel viewModel)
         {
-            var post = await _repository.Get(viewModel.Id);
+            var post = await _repository.GetAsync(viewModel.Id);
             post.SetDeleted(false);
 
             if (await Commit())

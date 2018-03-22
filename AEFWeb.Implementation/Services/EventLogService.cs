@@ -17,9 +17,9 @@ namespace AEFWeb.Implementation.Services
             _eventLogRepository = eventLogRepository;
         }
 
-        public async Task Add(EventLog entity)
+        public async Task AddAsync(EventLog entity)
         {
-            await _eventLogRepository.Add(entity);
+            await _eventLogRepository.AddAsync(entity);
             await _unitOfWork.Complete();
         }
     }

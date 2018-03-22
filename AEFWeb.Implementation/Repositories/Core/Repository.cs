@@ -19,22 +19,30 @@ namespace AEFWeb.Implementation.Repositories.Core
             DbSet = Context.Set<TEntity>();
         }
 
-        public virtual async Task<TEntity> Get(Guid id) =>
+        public virtual async Task<TEntity> GetAsync(Guid id) =>
             await DbSet.FindAsync(id);
 
-        public virtual async Task<IEnumerable<TEntity>> GetAll() =>
+        public virtual async Task<IEnumerable<TEntity>> GetAllAsync() =>
             await DbSet.ToListAsync();
 
-        public virtual async Task<IEnumerable<TEntity>> Find(Expression<Func<TEntity, bool>> predicate) =>
+        public virtual async Task<IEnumerable<TEntity>> FindAsync(Expression<Func<TEntity, bool>> predicate) =>
             await DbSet.Where(predicate).ToListAsync();
 
-        public virtual async Task<TEntity> GetByCriteria(Expression<Func<TEntity, bool>> predicate) =>
+        public virtual async Task<TEntity> GetByCriteriaAsync(Expression<Func<TEntity, bool>> predicate) =>
             await DbSet.FirstOrDefaultAsync(predicate);
 
-        public virtual async Task Add(TEntity entity) =>
+        public async Task<IQueryable<TEntity>> GetQueryable() =>
+            await Task.FromResult(DbSet.AsQueryable());
+
+        public async Task<IQueryable<TEntity>> GetQueryableByCriteria(Expression<Func<TEntity, bool>> predicate) => 
+            await Task.FromResult(DbSet.Where(predicate).AsQueryable());
+
+        public virtual async Task AddAsync(TEntity entity) =>
             await DbSet.AddAsync(entity);
 
-        public virtual async Task AddRange(IEnumerable<TEntity> entities) =>
+        public virtual async Task AddRangeAsync(IEnumerable<TEntity> entities) =>
             await DbSet.AddRangeAsync(entities);
+
+        
     }
 }

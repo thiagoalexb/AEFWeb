@@ -17,32 +17,29 @@ using System.Linq;
 
 namespace AEFWeb.Implementation.Services
 {
-    public class BookService : Service<IBookRepository>, IBookService
+    public class SpecialWeekService : Service<ISpecialWeekRepository>, ISpecialWeekService
     {
         private readonly IMapper _mapper;
 
-        public BookService(IMapper mapper,
+        public SpecialWeekService(IMapper mapper,
                             IMediatorHandler bus, 
                             IUnitOfWork unitOfWork) : base(bus, unitOfWork) => _mapper = mapper;
 
-        public async Task<BookViewModel> GetAsync(Guid id) => 
-            _mapper.Map<BookViewModel>(await _repository.GetAsync(id));
+        public async Task<SpecialWeekViewModel> GetAsync(Guid id) => 
+            _mapper.Map<SpecialWeekViewModel>(await _repository.GetAsync(id));
 
-        public async Task<IEnumerable<BookViewModel>> GetAllAsync() => 
-            _mapper.Map<IEnumerable<BookViewModel>>(await _repository.GetAllAsync());
+        public async Task<IEnumerable<SpecialWeekViewModel>> GetAllAsync() => 
+            _mapper.Map<IEnumerable<SpecialWeekViewModel>>(await _repository.GetAllAsync());
 
-        public async Task<PaginateResultBase<BookViewModel>> GetPaginateAsync(PaginateFilterBase filter)
+        public async Task<PaginateResultBase<SpecialWeekViewModel>> GetPaginateAsync(PaginateFilterBase filter)
         {
             var query = await _repository.GetQueryableByCriteria(x => !x.Deleted);
 
             if (!string.IsNullOrEmpty(filter.Search))
             {
                 filter.Search = filter.Search.ToLower();
-                query = query.Where(x => x.Author.ToLower().Contains(filter.Search) 
-                                        || x.Edition.ToLower().Contains(filter.Search)
-                                        || x.PublishingCompany.ToLower().Contains(filter.Search)
-                                        || x.Title.ToLower().Contains(filter.Search)
-                                        || x.Value.ToString().Contains(filter.Search));
+                query = query.Where(x => x.Title.ToLower().Contains(filter.Search) 
+                                        || x.Description.ToLower().Contains(filter.Search));
             }
 
             var total = query.Count();
@@ -55,28 +52,28 @@ namespace AEFWeb.Implementation.Services
             if (int.TryParse(filter.Take, out int take))
                 query = query.Take(take);
 
-            var list = _mapper.Map<List<BookViewModel>>(query.ToList());
+            var list = _mapper.Map<List<SpecialWeekViewModel>>(query.ToList());
 
-            return new PaginateResultBase<BookViewModel>() { Results = list, Total = total };
+            return new PaginateResultBase<SpecialWeekViewModel>() { Results = list, Total = total };
         }
 
-        public async Task AddAsync(BookViewModel viewModel)
+        public async Task AddAsync(SpecialWeekViewModel viewModel)
         {
             viewModel.Id = Guid.NewGuid();
-            var book = _mapper.Map<Book>(viewModel);
-            await _repository.AddAsync(book);
+            var specialWeek = _mapper.Map<SpecialWeek>(viewModel);
+            await _repository.AddAsync(specialWeek);
 
             if (await Commit())
                 await RegisterLog(new EventLog(Guid.NewGuid(), viewModel.CreationDate, viewModel.CreatorUserId, null, null, JsonConvert.SerializeObject(viewModel), Type, "Add"));
         }
         
-        public async Task UpdateAsync(BookViewModel viewModel)
+        public async Task UpdateAsync(SpecialWeekViewModel viewModel)
         {
-            var book = await _repository.GetAsync(viewModel.Id);
+            var specialWeek = await _repository.GetAsync(viewModel.Id);
 
-            if (book != null)
+            if (specialWeek != null)
             {
-                _mapper.Map(viewModel, book);
+                _mapper.Map(viewModel, specialWeek);
 
                 if (await Commit())
                     await RegisterLog(new EventLog(Guid.NewGuid(), null, null, viewModel.LastUpdateDate, viewModel.LastUpdatedUserId, JsonConvert.SerializeObject(viewModel), Type, "Update"));
@@ -87,19 +84,19 @@ namespace AEFWeb.Implementation.Services
             }
         }
 
-        public async Task RemoveAsync(BookViewModel viewModel)
+        public async Task RemoveAsync(SpecialWeekViewModel viewModel)
         {
-            var book = await _repository.GetAsync(viewModel.Id);
-            book.SetDeleted(true);
+            var specialWeek = await _repository.GetAsync(viewModel.Id);
+            specialWeek.SetDeleted(true);
 
             if (await Commit())
                 await RegisterLog(new EventLog(Guid.NewGuid(), null, null, viewModel.LastUpdateDate, viewModel.LastUpdatedUserId, JsonConvert.SerializeObject(viewModel), Type, "Remove"));
         }
 
-        public async Task RestoreAsync(BookViewModel viewModel)
+        public async Task RestoreAsync(SpecialWeekViewModel viewModel)
         {
-            var book = await _repository.GetAsync(viewModel.Id);
-            book.SetDeleted(false);
+            var specialWeek = await _repository.GetAsync(viewModel.Id);
+            specialWeek.SetDeleted(false);
 
             if (await Commit())
                 await RegisterLog(new EventLog(Guid.NewGuid(), null, null, viewModel.LastUpdateDate, viewModel.LastUpdatedUserId, JsonConvert.SerializeObject(viewModel), Type, "Restore"));

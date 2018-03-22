@@ -15,25 +15,25 @@ namespace AEFWeb.Implementation.Repositories
         public PostRepository(DbContext context) : base(context)
         { }
 
-        public override async Task<IEnumerable<Post>> GetAll() =>
+        public override async Task<IEnumerable<Post>> GetAllAsync() =>
             await DbSet.Include(x => x.User)
                                 .Include(x => x.PostTags)
                                     .ThenInclude(x => x.Tag)
                                     .ToListAsync();
 
-        public override async Task<Post> Get(Guid id) =>
+        public override async Task<Post> GetAsync(Guid id) =>
             await DbSet.Include(x => x.User)
                                 .Include(x => x.PostTags)
                                     .ThenInclude(x => x.Tag)
                                     .FirstOrDefaultAsync(x => x.Id == id);
 
-        public override async Task<IEnumerable<Post>> Find(Expression<Func<Post, bool>> predicate) =>
+        public override async Task<IEnumerable<Post>> FindAsync(Expression<Func<Post, bool>> predicate) =>
            await DbSet.Include(x => x.User)
                                 .Include(x => x.PostTags)
                                     .ThenInclude(x => x.Tag)
                                     .Where(predicate).ToListAsync();
 
-        public override async Task<Post> GetByCriteria(Expression<Func<Post, bool>> predicate) =>
+        public override async Task<Post> GetByCriteriaAsync(Expression<Func<Post, bool>> predicate) =>
             await DbSet.Include(x => x.User)
                                     .Include(x => x.PostTags)
                                         .ThenInclude(x => x.Tag)

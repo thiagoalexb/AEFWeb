@@ -21,7 +21,7 @@ namespace AEFWeb.Implementation.Notifications
              await Publish(@event);
 
         public async Task RaiseEventLog<T>(T @event) where T : EventLog =>
-            await _eventLogService.Add(@event);
+            await _eventLogService.AddAsync(@event);
 
         private async Task Publish<T>(T message) where T : INotification =>
             await _mediator.Publish(message);

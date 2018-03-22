@@ -36,7 +36,7 @@ namespace AEFWeb.Api.Middlewares
         private Task HandleExceptionAsync(HttpContext context, Exception exception)
         {
             var errorMessage = GetErrorMessage(exception);
-            _errorLogService.Add(new ErrorLog(Guid.NewGuid(), errorMessage, exception.ToString()));
+            _errorLogService.AddAsync(new ErrorLog(Guid.NewGuid(), errorMessage, exception.ToString()));
 
             var result = JsonConvert.SerializeObject(new { error = errorMessage });
             context.Response.ContentType = "application/json";

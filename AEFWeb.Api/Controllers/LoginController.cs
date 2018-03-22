@@ -34,7 +34,7 @@ namespace AEFWeb.Api.Controllers
                 return Response(loginViewModel);
             }
 
-            var user = await _userService.GetByEmail(loginViewModel.Email);
+            var user = await _userService.GetByEmailAsync(loginViewModel.Email);
 
             if (user == null) return new { authenticated = false, message = "Usuário não encontrado" };
 

@@ -28,26 +28,30 @@ namespace AEFWeb.Implementation.Services
 
         public async Task Execute(string email, string subject, string message)
         {
-            string toEmail = string.IsNullOrEmpty(email)
-                             ? _emailSettings.ToEmail
-                             : email;
-            MailMessage mail = new MailMessage()
-            {
-                From = new MailAddress(_emailSettings.UsernameEmail, "AEF")
-            };
+            await Task.Run(async () =>
+             {
+                 string toEmail = string.IsNullOrEmpty(email)
+                              ? _emailSettings.ToEmail
+                              : email;
+                 MailMessage mail = new MailMessage()
+                 {
+                     From = new MailAddress(_emailSettings.UsernameEmail, "AEF")
+                 };
 
-            mail.To.Add(new MailAddress(toEmail));
-            mail.Subject = subject;
-            mail.Body = message;
-            mail.IsBodyHtml = true;
+                 mail.To.Add(new MailAddress(toEmail));
+                 mail.Subject = subject;
+                 mail.Body = message;
+                 mail.IsBodyHtml = true;
 
-            using (SmtpClient smtp = new SmtpClient(_emailSettings.PrimaryDomain, _emailSettings.PrimaryPort))
-            {
-                smtp.UseDefaultCredentials = false;
-                smtp.Credentials = new NetworkCredential(_emailSettings.UsernameEmail, _emailSettings.UsernamePassword);
-                smtp.EnableSsl = true;
-                await smtp.SendMailAsync(mail);
-            }
+                 using (SmtpClient smtp = new SmtpClient(_emailSettings.PrimaryDomain, _emailSettings.PrimaryPort))
+                 {
+                     smtp.UseDefaultCredentials = false;
+                     smtp.Credentials = new NetworkCredential(_emailSettings.UsernameEmail, _emailSettings.UsernamePassword);
+                     smtp.EnableSsl = true;
+                     await smtp.SendMailAsync(mail);
+                 }
+             });
+            
         }
     }
 }

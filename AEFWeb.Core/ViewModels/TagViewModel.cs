@@ -1,6 +1,5 @@
 ﻿using AEFWeb.Core.ViewModels.Core;
 using System;
-using System.ComponentModel.DataAnnotations;
 
 namespace AEFWeb.Core.ViewModels
 {

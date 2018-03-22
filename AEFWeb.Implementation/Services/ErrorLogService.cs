@@ -13,9 +13,9 @@ namespace AEFWeb.Implementation.Services
         public ErrorLogService(IMediatorHandler bus, IUnitOfWork unitOfWork) 
                                 : base(bus, unitOfWork) { }
         
-        public async Task Add(ErrorLog entity)
+        public async Task AddAsync(ErrorLog entity)
         {
-            await _repository.Add(entity);
+            await _repository.AddAsync(entity);
             await _unitOfWork.Complete();
         }
     }
