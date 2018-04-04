@@ -102,6 +102,17 @@ namespace AEFWeb.Implementation.Services
                 await RegisterLog(new EventLog(Guid.NewGuid(), null, null, viewModel.LastUpdateDate, viewModel.LastUpdatedUserId, JsonConvert.SerializeObject(viewModel), Type, "Restore"));
         }
 
-        
+        public async Task<List<AutoCompleteViewModel>> GetAutoCompleteAsync(string search)
+        {
+            search = search.ToLower();
+            var query = await _repository.GetQueryableByCriteria(x => x.Title.Contains(search));
+
+            return query.Select(x => new AutoCompleteViewModel()
+            {
+                Id = x.Id,
+                Label = x.Title
+            })
+            .ToList();
+        }
     }
 }

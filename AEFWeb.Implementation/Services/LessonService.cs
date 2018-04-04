@@ -10,50 +10,88 @@ using System.Threading.Tasks;
 using AEFWeb.Core.Notifications;
 using AEFWeb.Core.UnitOfWork;
 using AutoMapper;
+using AEFWeb.Data.Entities;
+using Newtonsoft.Json;
 
 namespace AEFWeb.Implementation.Services
 {
     public class LessonService : Service<ILessonRepository>, ILessonService
     {
         private readonly IMapper _mapper;
+        private readonly IModuleService _moduleService;
 
         public LessonService(IMapper mapper,
                             IMediatorHandler bus,
-                            IUnitOfWork unitOfWork) : base(bus, unitOfWork) => _mapper = mapper;
+                            IUnitOfWork unitOfWork,
+                            IModuleService moduleService) : base(bus, unitOfWork)
+        {
+            _mapper = mapper;
+            _moduleService = moduleService;
+        }
 
-        public Task AddAsync(LessonViewModel viewModel)
+        public Task<IEnumerable<LessonsViewModel>> GetAllAsync()
         {
             throw new NotImplementedException();
         }
 
-        public Task<IEnumerable<LessonViewModel>> GetAllAsync()
+        public Task<LessonsViewModel> GetAsync(Guid id)
         {
             throw new NotImplementedException();
         }
 
-        public Task<LessonViewModel> GetAsync(Guid id)
+        public Task<PaginateResultBase<LessonsViewModel>> GetPaginateAsync(PaginateFilterBase filter)
         {
             throw new NotImplementedException();
         }
 
-        public Task<PaginateResultBase<LessonViewModel>> GetPaginateAsync(PaginateFilterBase filter)
+        public async Task AddAsync(LessonsViewModel viewModel)
+        {
+            foreach (var item in viewModel.Lessons)
+            {
+                item.Id = Guid.NewGuid();
+                item.ModuleId = viewModel.ModuleId;
+                item.SpecialWeekId = viewModel.SpecialWeekId;
+                var lesson = _mapper.Map<Lesson>(item);
+                await _repository.AddAsync(lesson);
+            }
+
+            if (await Commit())
+                await RegisterLog(new EventLog(Guid.NewGuid(), viewModel.CreationDate, viewModel.CreatorUserId, null, null, JsonConvert.SerializeObject(viewModel), Type, "Add"));
+        }
+
+        public async Task UpdateAsync(LessonsViewModel viewModel)
+        {
+            foreach (var item in viewModel.Lessons)
+            {
+                item.Id = Guid.NewGuid();
+                item.ModuleId = viewModel.ModuleId;
+                item.SpecialWeekId = viewModel.SpecialWeekId;
+                var lesson = _mapper.Map<Lesson>(item);
+                await _repository.AddAsync(lesson);
+            }
+
+            if (await Commit())
+                await RegisterLog(new EventLog(Guid.NewGuid(), viewModel.CreationDate, viewModel.CreatorUserId, null, null, JsonConvert.SerializeObject(viewModel), Type, "Update"));
+        }
+
+        public Task RemoveAsync(LessonsViewModel viewModel)
         {
             throw new NotImplementedException();
         }
 
-        public Task RemoveAsync(LessonViewModel viewModel)
+        public Task RestoreAsync(LessonsViewModel viewModel)
         {
             throw new NotImplementedException();
         }
 
-        public Task RestoreAsync(LessonViewModel viewModel)
+        private async Task<Guid> GetModule(LessonsViewModel viewModel)
         {
-            throw new NotImplementedException();
-        }
+            if (viewModel.ModuleId.HasValue) return viewModel.ModuleId.Value;
 
-        public Task UpdateAsync(LessonViewModel viewModel)
-        {
-            throw new NotImplementedException();
+            viewModel.Module.Id = Guid.NewGuid();
+
+            await _moduleService.AddAsync(viewModel.Module);
+            return viewModel.Module.Id;
         }
     }
 }
