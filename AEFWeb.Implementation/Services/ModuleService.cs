@@ -59,7 +59,6 @@ namespace AEFWeb.Implementation.Services
 
         public async Task AddAsync(ModuleViewModel viewModel)
         {
-            viewModel.Id = Guid.NewGuid();
             var module = _mapper.Map<Module>(viewModel);
             await _repository.AddAsync(module);
 
@@ -102,6 +101,17 @@ namespace AEFWeb.Implementation.Services
                 await RegisterLog(new EventLog(Guid.NewGuid(), null, null, viewModel.LastUpdateDate, viewModel.LastUpdatedUserId, JsonConvert.SerializeObject(viewModel), Type, "Restore"));
         }
 
-        
+        public async Task<List<AutoCompleteViewModel>> GetAutoCompleteAsync(string search)
+        {
+            search = search.ToLower();
+            var query = await _repository.GetQueryableByCriteria(x => x.Name.Contains(search));
+
+            return query.Select(x => new AutoCompleteViewModel()
+            {
+                Id = x.Id,
+                Label = x.Name
+            })
+            .ToList();
+        }
     }
 }

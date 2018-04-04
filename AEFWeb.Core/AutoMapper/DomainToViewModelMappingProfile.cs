@@ -16,6 +16,9 @@ namespace AEFWeb.Core.AutoMapper
             CreateMap<Book, BookViewModel>();
             CreateMap<Event, EventViewModel>();
             CreateMap<Lesson, LessonViewModel>();
+            CreateMap<Module, ModuleViewModel>();
+            CreateMap<Fase, FaseViewModel>();
+            CreateMap<SpecialWeek, SpecialWeekViewModel>();
         }
     }
 }

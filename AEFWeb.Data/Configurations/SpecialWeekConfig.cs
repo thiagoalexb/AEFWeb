@@ -18,8 +18,7 @@ namespace AEFWeb.Data.Configurations
 
             builder.Property(c => c.Description)
                .HasColumnType("varchar(5000)")
-               .HasMaxLength(100)
-               .IsRequired();
+               .HasMaxLength(100);
 
             builder.HasMany(x => x.Lessons)
                 .WithOne(x => x.SpecialWeek);

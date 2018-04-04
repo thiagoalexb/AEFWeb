@@ -14,7 +14,7 @@ namespace AEFWeb.Core.ViewModels
         public string Name { get; set; }
         public string Description { get; set; }
 
-        public Guid FaseId { get; private set; }
+        public Guid FaseId { get; set; }
         public FaseViewModel Fase { get; set; }
     }
 }

@@ -22,10 +22,14 @@ namespace AEFWeb.Api.Controllers
                                 INotificationHandler<Notification> notifications) : base(notifications) =>
            _moduleService = moduleService;
 
+        [ApiExplorerSettings(IgnoreApi = true)]
+        [NonAction]
         [HttpGet]
         [Route("get-all")]
         public async Task<IActionResult> Get() => Ok(await _moduleService.GetAllAsync());
 
+        [ApiExplorerSettings(IgnoreApi = true)]
+        [NonAction]
         [HttpGet]
         [Route("get-by-id")]
         public async Task<IActionResult> Get(Guid id)
@@ -36,6 +40,8 @@ namespace AEFWeb.Api.Controllers
             return Response(module);
         }
 
+        [ApiExplorerSettings(IgnoreApi = true)]
+        [NonAction]
         [HttpGet]
         [Route("paginate")]
         public async Task<IActionResult> GetPaginate(PaginateFilterBase filter)
@@ -44,6 +50,14 @@ namespace AEFWeb.Api.Controllers
             return Response(paginate);
         }
 
+        [HttpGet]
+        [Route("auto-complete")]
+        public async Task<IActionResult> GetAutoComplete(string search)
+        {
+            var autocomplete = await _moduleService.GetAutoCompleteAsync(search);
+            return Response(autocomplete);
+        }
+        
         [HttpPost]
         [Route("add")]
         [TokenAddFilter]
@@ -58,6 +72,8 @@ namespace AEFWeb.Api.Controllers
             return Response(entity);
         }
 
+        [ApiExplorerSettings(IgnoreApi = true)]
+        [NonAction]
         [HttpPut]
         [Route("update")]
         [TokenUpdateFilter]
@@ -72,6 +88,8 @@ namespace AEFWeb.Api.Controllers
             return Response(entity);
         }
 
+        [ApiExplorerSettings(IgnoreApi = true)]
+        [NonAction]
         [HttpDelete]
         [Route("delete")]
         [TokenUpdateFilter]
@@ -82,6 +100,8 @@ namespace AEFWeb.Api.Controllers
             return Response();
         }
 
+        [ApiExplorerSettings(IgnoreApi = true)]
+        [NonAction]
         [HttpPatch]
         [Route("restore")]
         [TokenUpdateFilter]

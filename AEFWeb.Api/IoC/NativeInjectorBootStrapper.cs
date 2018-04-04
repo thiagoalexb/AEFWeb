@@ -32,10 +32,14 @@ namespace AEFWeb.Api.IoC
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IPostService, PostService>();
             services.AddScoped<IBookService, BookService>();
-            //services.AddScoped<IEventService, EventService>();
             services.AddScoped<IErrorLogService, ErrorLogService>();
             services.AddScoped<IEventLogService, EventLogService>();
             services.AddScoped<IEmailService, EmailService>();
+            services.AddScoped<ITagService, TagService>();
+            services.AddScoped<IFaseService, FaseService>();
+            services.AddScoped<IModuleService, ModuleService>();
+            services.AddScoped<ISpecialWeekService, SpecialWeekService>();
+            services.AddScoped<ILessonService, LessonService>();
 
             //Repository
             services.AddScoped<IEventLogRepository, EventLogRepository>();

@@ -15,6 +15,9 @@ namespace AEFWeb.Core.AutoMapper
             CreateMap<BookViewModel, Book>().ForMember(x => x.Id, opt => opt.Ignore());
             CreateMap<EventViewModel, Event>().ForMember(x => x.Id, opt => opt.Ignore());
             CreateMap<LessonViewModel, Lesson>().ForMember(x => x.Id, opt => opt.Ignore());
+            CreateMap<ModuleViewModel, Module>().ForMember(x => x.Id, opt => opt.Ignore());
+            CreateMap<FaseViewModel, Fase>().ForMember(x => x.Id, opt => opt.Ignore());
+            CreateMap<SpecialWeekViewModel, SpecialWeek>().ForMember(x => x.Id, opt => opt.Ignore());
         }
     }
 }

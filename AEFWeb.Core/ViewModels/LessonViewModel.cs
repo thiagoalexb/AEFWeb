@@ -1,9 +1,10 @@
-﻿using System;
+﻿using AEFWeb.Core.ViewModels.Core;
+using System;
 using System.ComponentModel.DataAnnotations;
 
 namespace AEFWeb.Core.ViewModels
 {
-    public class LessonViewModel
+    public class LessonViewModel : ViewModelBase
     {
         public Guid Id { get; set; }
 

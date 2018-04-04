@@ -54,7 +54,7 @@ namespace AEFWeb.Api.Controllers
                 NotifyModelStateErrors();
                 return Response(entity);
             }
-            await _lessonService.AddAsync(entity);
+            //await _lessonService.AddAsync(entity);
             return Response(entity);
         }
 
@@ -68,7 +68,7 @@ namespace AEFWeb.Api.Controllers
                 NotifyModelStateErrors();
                 return Response(entity);
             }
-            await _lessonService.UpdateAsync(entity);
+           // await _lessonService.UpdateAsync(entity);
             return Response(entity);
         }
 
@@ -77,7 +77,7 @@ namespace AEFWeb.Api.Controllers
         [TokenUpdateFilter]
         public async Task<IActionResult> Delete([FromBody]LessonViewModel entity)
         {
-            await _lessonService.RemoveAsync(entity);
+            //await _lessonService.RemoveAsync(entity);
 
             return Response();
         }
@@ -87,7 +87,7 @@ namespace AEFWeb.Api.Controllers
         [TokenUpdateFilter]
         public async Task<IActionResult> Restore([FromBody]LessonViewModel entity)
         {
-            await _lessonService.RestoreAsync(entity);
+            //await _lessonService.RestoreAsync(entity);
 
             return Response();
         }
