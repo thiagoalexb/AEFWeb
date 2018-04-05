@@ -12,6 +12,8 @@ using AEFWeb.Core.UnitOfWork;
 using AutoMapper;
 using AEFWeb.Data.Entities;
 using Newtonsoft.Json;
+using System.Linq;
+using AEFWeb.Implementation.Notifications;
 
 namespace AEFWeb.Implementation.Services
 {
@@ -19,32 +21,75 @@ namespace AEFWeb.Implementation.Services
     {
         private readonly IMapper _mapper;
         private readonly IModuleService _moduleService;
+        private readonly IFaseService _faseService;
+        private readonly ISpecialWeekService _specialWeekService;
 
         public LessonService(IMapper mapper,
                             IMediatorHandler bus,
                             IUnitOfWork unitOfWork,
-                            IModuleService moduleService) : base(bus, unitOfWork)
+                            IModuleService moduleService,
+                            IFaseService faseService,
+                            ISpecialWeekService specialWeekService) : base(bus, unitOfWork)
         {
             _mapper = mapper;
             _moduleService = moduleService;
+            _faseService = faseService;
+            _specialWeekService = specialWeekService;
         }
 
-        public Task<IEnumerable<LessonsViewModel>> GetAllAsync()
+        public async Task<IEnumerable<LessonViewModel>> GetAllAsync() =>
+            _mapper.Map<IEnumerable<LessonViewModel>>(await _repository.GetAllAsync());
+
+        public async Task AddAsync(LessonViewModel viewModel)
+        {
+            viewModel.Id = Guid.NewGuid();
+            var lesson = _mapper.Map<Lesson>(viewModel);
+            await _repository.AddAsync(lesson);
+
+            if (await Commit())
+                await RegisterLog(new EventLog(Guid.NewGuid(), viewModel.CreationDate, viewModel.CreatorUserId, null, null, JsonConvert.SerializeObject(viewModel), Type, "Add"));
+        }
+
+        public async Task UpdateAsync(LessonViewModel viewModel)
+        {
+            var lesson = await _repository.GetAsync(viewModel.Id);
+
+            if (lesson != null)
+            {
+                _mapper.Map(viewModel, lesson);
+
+                if (await Commit())
+                    await RegisterLog(new EventLog(Guid.NewGuid(), null, null, viewModel.LastUpdateDate, viewModel.LastUpdatedUserId, JsonConvert.SerializeObject(viewModel), Type, "Update"));
+            }
+            else
+            {
+                await _bus.RaiseEvent(new Notification("defaultError", "Título não encontrado"));
+            }
+        }
+
+        public async Task<IEnumerable<object>> GetAllLessonsAsync () =>
+            new List<object> ()
+                //fases
+                .Concat(await _faseService.GetAllAsync())
+                //special weeks
+                .Concat(await _specialWeekService.GetAllAsync())
+                //not linked lessons
+                .Concat(await _repository.GetQueryableByCriteria(l =>
+                    !l.ModuleId.HasValue &&
+                    !l.SpecialWeekId.HasValue
+                ));
+
+        public Task<LessonViewModel> GetAsync(Guid id)
         {
             throw new NotImplementedException();
         }
 
-        public Task<LessonsViewModel> GetAsync(Guid id)
+        public Task<PaginateResultBase<LessonViewModel>> GetPaginateAsync(PaginateFilterBase filter)
         {
             throw new NotImplementedException();
         }
 
-        public Task<PaginateResultBase<LessonsViewModel>> GetPaginateAsync(PaginateFilterBase filter)
-        {
-            throw new NotImplementedException();
-        }
-
-        public async Task AddAsync(LessonsViewModel viewModel)
+        public async Task AddLessonsAsync(LessonsViewModel viewModel)
         {
             foreach (var item in viewModel.Lessons)
             {
@@ -59,7 +104,7 @@ namespace AEFWeb.Implementation.Services
                 await RegisterLog(new EventLog(Guid.NewGuid(), viewModel.CreationDate, viewModel.CreatorUserId, null, null, JsonConvert.SerializeObject(viewModel), Type, "Add"));
         }
 
-        public async Task UpdateAsync(LessonsViewModel viewModel)
+        public async Task UpdateLessonsAsync(LessonsViewModel viewModel)
         {
             foreach (var item in viewModel.Lessons)
             {
@@ -74,17 +119,17 @@ namespace AEFWeb.Implementation.Services
                 await RegisterLog(new EventLog(Guid.NewGuid(), viewModel.CreationDate, viewModel.CreatorUserId, null, null, JsonConvert.SerializeObject(viewModel), Type, "Update"));
         }
 
-        public Task RemoveAsync(LessonsViewModel viewModel)
+        public Task RemoveAsync(LessonViewModel viewModel)
         {
             throw new NotImplementedException();
         }
 
-        public Task RestoreAsync(LessonsViewModel viewModel)
+        public Task RestoreAsync(LessonViewModel viewModel)
         {
             throw new NotImplementedException();
         }
 
-        private async Task<Guid> GetModule(LessonsViewModel viewModel)
+        private async Task<Guid> GetModule(LessonViewModel viewModel)
         {
             if (viewModel.ModuleId.HasValue) return viewModel.ModuleId.Value;
 
