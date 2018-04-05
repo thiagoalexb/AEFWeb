@@ -24,10 +24,12 @@ namespace AEFWeb.Api
                 .ConfigureAppConfiguration((hostingContext, config) =>
                 {
                     var env = hostingContext.HostingEnvironment;
+                    var envName = hostingContext.HostingEnvironment.EnvironmentName;
+                    if (String.IsNullOrEmpty(envName)) envName = "Development";
 
                     config.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
 #if DEBUG
-                .AddJsonFile($"appsettings.Development.json", optional: true, reloadOnChange: true);
+                .AddJsonFile($"appsettings.{envName}.json", optional: true, reloadOnChange: true);
 #else
                 .AddJsonFile($"appsettings.Production.json", optional: true, reloadOnChange: true);
 #endif

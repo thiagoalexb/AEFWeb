@@ -22,6 +22,10 @@ namespace AEFWeb.Data.Context
         public DbSet<PostTag> PostTag { get; set; }
         public DbSet<SystemConfiguration> SystemConfiguration { get; set; }
 
+        // public AEFContext(IHostingEnvironment env) : base()
+        // {
+        // }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             //Get all classes that implements IMapping
@@ -40,18 +44,42 @@ namespace AEFWeb.Data.Context
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
+            string envName = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
+            if (String.IsNullOrEmpty(envName)) envName = "Development";
+
             var config = new ConfigurationBuilder()
                 .SetBasePath(Directory.GetCurrentDirectory())
                 .AddJsonFile("appsettings.json")
 #if DEBUG
-                .AddJsonFile($"appsettings.Development.json", optional: true, reloadOnChange: true)
+                .AddJsonFile($"appsettings.{envName}.json", optional: true, reloadOnChange: true)
 #else
                 .AddJsonFile($"appsettings.Production.json", optional: true, reloadOnChange: true)
 #endif
                 .Build();
 
+            
+
             // define the database to use
+            #if DEBUG
+            var connectionString = config.GetConnectionString("AEFConnection");
+            //replace env. variables
+            var r = new System.Text.RegularExpressions.Regex("\\${.*}\\;");
+            var matched = r.Match(connectionString);
+            while (matched.Success)
+            {
+                var varName = matched.Value.Substring(2, (matched.Value.Length - 4));
+                var varValue = Environment.GetEnvironmentVariable(varName);
+                connectionString = connectionString.Replace(
+                    matched.Value,
+                    String.Concat(varValue, ";")
+                );
+
+                matched = matched.NextMatch();
+            }
+            optionsBuilder.UseSqlServer(connectionString);
+            #else
             optionsBuilder.UseSqlServer(config.GetConnectionString("AEFConnection"));
+            #endif
         }
     }
 }

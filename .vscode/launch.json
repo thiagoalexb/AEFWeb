@@ -30,12 +30,11 @@
                 }
             },
             "env": {
-                "ASPNETCORE_ENVIRONMENT": "Development"
+                "ASPNETCORE_ENVIRONMENT": "Linux"
             },
             "sourceFileMap": {
                 "/Views": "${workspaceFolder}/Views"
-            },
-            "applicationUrl": "http://localhost:5000"
+            }
         },
         {
             "name": ".NET Core Attach",
