@@ -2,8 +2,14 @@
 using AEFWeb.Core.UnitOfWork;
 using AEFWeb.Data.Entities;
 using AEFWeb.Implementation.Notifications;
+using AEFWeb.Core.Repositories.Core;
+using AEFWeb.Core.ViewModels.Core;
+using AEFWeb.Data.Entities.Core;
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
+using System.Linq;
+using System.Linq.Expressions;
 
 namespace AEFWeb.Implementation.Services.Core
 {
@@ -35,6 +41,42 @@ namespace AEFWeb.Implementation.Services.Core
         public async Task RegisterLog(EventLog log)
         {
             await _bus.RaiseEventLog(log);
+        }
+
+        public async Task<List<AutoCompleteViewModel>> GetAutoCompleteAsync<TEntity> (
+            string search,
+            Expression<Func<TEntity, string>> labelField) where TEntity : Entity
+        {
+            Guid id;
+            var repository = _repository as IRepository<TEntity>;
+
+            if (Guid.TryParse(search, out id))
+            {
+                var entity = await repository.GetAsync(id);
+
+                return new List<AutoCompleteViewModel>
+                {
+                    new AutoCompleteViewModel
+                    {
+                        Id = entity.Id,
+                        Label = labelField.Compile().Invoke(entity)
+                    }
+                };
+            }
+            else
+            {
+                search = search.ToLower();
+                var query = await repository.GetQueryableByCriteria(x =>
+                    labelField.Compile().Invoke(x).Contains(search)
+                );
+
+                return query.Select(x => new AutoCompleteViewModel()
+                {
+                    Id = x.Id,
+                    Label = labelField.Compile().Invoke(x)
+                })
+                .ToList();
+            }
         }
     }
 }

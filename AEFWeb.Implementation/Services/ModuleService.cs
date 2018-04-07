@@ -22,13 +22,13 @@ namespace AEFWeb.Implementation.Services
         private readonly IMapper _mapper;
 
         public ModuleService(IMapper mapper,
-                            IMediatorHandler bus, 
+                            IMediatorHandler bus,
                             IUnitOfWork unitOfWork) : base(bus, unitOfWork) => _mapper = mapper;
 
-        public async Task<ModuleViewModel> GetAsync(Guid id) => 
+        public async Task<ModuleViewModel> GetAsync(Guid id) =>
             _mapper.Map<ModuleViewModel>(await _repository.GetAsync(id));
 
-        public async Task<IEnumerable<ModuleViewModel>> GetAllAsync() => 
+        public async Task<IEnumerable<ModuleViewModel>> GetAllAsync() =>
             _mapper.Map<IEnumerable<ModuleViewModel>>(await _repository.GetAllAsync());
 
         public async Task<PaginateResultBase<ModuleViewModel>> GetPaginateAsync(PaginateFilterBase filter)
@@ -38,7 +38,7 @@ namespace AEFWeb.Implementation.Services
             if (!string.IsNullOrEmpty(filter.Search))
             {
                 filter.Search = filter.Search.ToLower();
-                query = query.Where(x => x.Name.ToLower().Contains(filter.Search) 
+                query = query.Where(x => x.Name.ToLower().Contains(filter.Search)
                                         || x.Description.ToLower().Contains(filter.Search));
             }
 
@@ -65,7 +65,7 @@ namespace AEFWeb.Implementation.Services
             if (await Commit())
                 await RegisterLog(new EventLog(Guid.NewGuid(), viewModel.CreationDate, viewModel.CreatorUserId, null, null, JsonConvert.SerializeObject(viewModel), Type, "Add"));
         }
-        
+
         public async Task UpdateAsync(ModuleViewModel viewModel)
         {
             var module = await _repository.GetAsync(viewModel.Id);
@@ -101,17 +101,7 @@ namespace AEFWeb.Implementation.Services
                 await RegisterLog(new EventLog(Guid.NewGuid(), null, null, viewModel.LastUpdateDate, viewModel.LastUpdatedUserId, JsonConvert.SerializeObject(viewModel), Type, "Restore"));
         }
 
-        public async Task<List<AutoCompleteViewModel>> GetAutoCompleteAsync(string search)
-        {
-            search = search.ToLower();
-            var query = await _repository.GetQueryableByCriteria(x => x.Name.Contains(search));
-
-            return query.Select(x => new AutoCompleteViewModel()
-            {
-                Id = x.Id,
-                Label = x.Name
-            })
-            .ToList();
-        }
+        public async Task<List<AutoCompleteViewModel>> GetAutoCompleteAsync(string search) =>
+            await this.GetAutoCompleteAsync<Module>(search, x => x.Name);
     }
 }
