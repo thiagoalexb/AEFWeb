@@ -67,7 +67,7 @@ namespace AEFWeb.Implementation.Services.Core
             {
                 search = search.ToLower();
                 var query = await repository.GetQueryableByCriteria(x =>
-                    labelField.Compile().Invoke(x).Contains(search)
+                    labelField.Compile().Invoke(x).ToLower().Contains(search)
                 );
 
                 return query.Select(x => new AutoCompleteViewModel()
