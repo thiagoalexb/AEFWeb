@@ -37,6 +37,9 @@ namespace AEFWeb.Implementation.Services
             _specialWeekService = specialWeekService;
         }
 
+        public async Task<LessonViewModel> GetAsync(Guid id) =>
+            _mapper.Map<LessonViewModel>(await _repository.GetAsync(id));
+
         public async Task<IEnumerable<LessonViewModel>> GetAllAsync() =>
             _mapper.Map<IEnumerable<LessonViewModel>>(await _repository.GetAllAsync());
 
@@ -78,11 +81,6 @@ namespace AEFWeb.Implementation.Services
                     !l.ModuleId.HasValue &&
                     !l.SpecialWeekId.HasValue
                 ));
-
-        public Task<LessonViewModel> GetAsync(Guid id)
-        {
-            throw new NotImplementedException();
-        }
 
         public Task<PaginateResultBase<LessonViewModel>> GetPaginateAsync(PaginateFilterBase filter)
         {
