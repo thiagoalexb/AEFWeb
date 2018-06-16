@@ -1,0 +1,13 @@
+#FROM microsoft/aspnetcore-build:lts
+FROM microsoft/dotnet:2.0.7-sdk-2.1.105-stretch
+ARG migrate
+RUN echo $migrate
+RUN echo $migrate > '/migrate.txt'
+COPY . /app
+WORKDIR /app
+RUN dotnet restore
+RUN dotnet build
+EXPOSE 80/tcp
+RUN chmod +x ./entrypoint.sh
+CMD /bin/bash ./entrypoint.sh
+

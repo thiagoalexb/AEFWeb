@@ -1,0 +1,43 @@
+version: '2'
+
+services:
+  db:
+    container_name: db
+    #image: microsoft/mssql-server-linux:2017-latest
+    image: microsoft/mssql-server-linux
+    environment:
+      - SA_PASSWORD=$SA_PASSWORD
+      - ACCEPT_EULA=Y
+      - MSSQL_PID=Express
+    restart: always
+
+  api:
+    container_name: api
+    #image: microsoft/dotnet:2.0.7-runtime-stretch
+    #image: microsoft/dotnet:2.0-sdk
+    image: microsoft/dotnet:2.0.7-sdk-2.1.105-stretch
+    #docker-compose build --build-arg migrate=1 api
+    build: 
+        context: .
+        dockerfile: ./docker-dotnet-core
+    volumes:
+      - ./:/app
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Linux
+      - DEBUG=true
+      - SQL_SERVER_PW=$SA_PASSWORD
+      - ASPNETCORE_URLS=http://0.0.0.0:80
+    ports:
+      - 8000:80
+    depends_on:
+      - db
+
+  web-app:
+    container_name: app
+    image: node:8.11.1-onbuild
+    volumes:
+      - ../aef-app:/usr/src/app
+    ports:
+      - 8080:3000
+    depends_on:
+      - api

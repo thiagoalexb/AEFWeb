@@ -77,8 +77,10 @@ namespace AEFWeb.Data.Context
                 matched = matched.NextMatch();
             }
             optionsBuilder.UseSqlServer(connectionString);
+            System.Console.WriteLine("Connection string: {0}", connectionString);
             #else
             optionsBuilder.UseSqlServer(config.GetConnectionString("AEFConnection"));
+	    System.Console.WriteLine("Connection string: {0}", config.GetConnectionString("AEFConnection"));
             #endif
         }
     }
