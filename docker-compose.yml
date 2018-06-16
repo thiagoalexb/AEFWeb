@@ -13,13 +13,13 @@ services:
 
   api:
     container_name: api
-    #image: microsoft/dotnet:2.0.7-runtime-stretch
-    #image: microsoft/dotnet:2.0-sdk
-    image: microsoft/dotnet:2.0.7-sdk-2.1.105-stretch
-    #docker-compose build --build-arg migrate=1 api
     build: 
         context: .
         dockerfile: ./docker-dotnet-core
+    #image: microsoft/dotnet:2.0.7-runtime-stretch
+    #image: microsoft/dotnet:2.0-sdk
+    image: jhonasn/dotnet:2.0.7-sdk-2.1.105-stretch
+    #docker-compose build --build-arg migrate=1 api
     volumes:
       - ./:/app
     environment:
