@@ -28,18 +28,27 @@ services:
       - SQL_SERVER_PW=$SA_PASSWORD
       - ASPNETCORE_URLS=http://0.0.0.0:80
       #set true to update database
-      - migrate=false
+      - migrate=true
     ports:
       - 5000:80
     depends_on:
       - db
 
-  web-app:
+  app:
     container_name: app
-    image: node:8.11.1-onbuild
+    image: node:8.11-alpine
+    user: node
+    working_dir: /usr/src/app
+    environment:
+      - NODE_ENV=development
+      - HOST=0.0.0.0
     volumes:
       - ../aef-app:/usr/src/app
+    expose:
+      - "8080"
     ports:
-      - 8080:3000
+      - 8000:8080
+    command: npm start
     depends_on:
       - api
+
