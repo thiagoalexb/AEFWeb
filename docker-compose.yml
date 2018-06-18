@@ -27,6 +27,8 @@ services:
       - DEBUG=true
       - SQL_SERVER_PW=$SA_PASSWORD
       - ASPNETCORE_URLS=http://0.0.0.0:80
+      #set true to update database
+      - migrate=false
     ports:
       - 8000:80
     depends_on:

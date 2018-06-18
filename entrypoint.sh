@@ -1,21 +1,19 @@
 #!/bin/bash
 
-echo 'iniciando aplicação'
-migrate=$(head -n 1 '/migrate.txt')
-echo `migrate: ${migrate}`
+echo 'Iniciando web service'
 
-if [ -z $migrate ]; then #null
-#just start the app
-	cd '/app/AEFWeb.Api' &&
-	dotnet '/app/AEFWeb.Api/bin/Debug/netcoreapp2.0/AEFWeb.Api.dll';
-else 
+if $migrate; then
 #update database
+	echo 'Migrating...';
 	cd '/app/AEFWeb.Data' && 
 	dotnet ef -s '/app/AEFWeb.Api' database update &&
 #and start the app
 	cd '/app/AEFWeb.Api' &&
 	dotnet '/app/AEFWeb.Api/bin/Debug/netcoreapp2.0/AEFWeb.Api.dll';
+else 
+#just start the app
+	echo 'Migration off';
+	cd '/app/AEFWeb.Api' &&
+	dotnet '/app/AEFWeb.Api/bin/Debug/netcoreapp2.0/AEFWeb.Api.dll';
 fi
-
-rm '/migrate.txt'
 
